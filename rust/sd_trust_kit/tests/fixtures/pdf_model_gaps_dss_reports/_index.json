@@ -1,0 +1,21 @@
+[ {
+  "file" : "sources/byterange-decimal-entry.pdf",
+  "report" : "byterange-decimal-entry.json",
+  "error" : null
+}, {
+  "file" : "sources/byterange-negative-entry.pdf",
+  "report" : "byterange-negative-entry.json",
+  "error" : null
+}, {
+  "file" : "sources/control-valid.pdf",
+  "report" : "control-valid.json",
+  "error" : null
+}, {
+  "file" : "sources/duplicate-field-reference-later-revision.pdf",
+  "report" : "duplicate-field-reference-later-revision.json",
+  "error" : null
+}, {
+  "file" : "sources/field-name-changed-after-signing.pdf",
+  "report" : "field-name-changed-after-signing.json",
+  "error" : null
+} ]

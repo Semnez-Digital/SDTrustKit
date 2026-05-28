@@ -1,0 +1,132 @@
+[
+  {
+    "file": "byterange-decimal-entry.pdf",
+    "error": null,
+    "primary": {
+      "indication": "TOTAL_FAILED",
+      "subIndication": "FORMAT_FAILURE",
+      "id": "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147"
+    },
+    "all": [
+      {
+        "indication": "TOTAL_FAILED",
+        "subIndication": "FORMAT_FAILURE",
+        "id": "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147"
+      },
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+      },
+      {
+        "indication": "FAILED",
+        "subIndication": "HASH_FAILURE",
+        "id": "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67"
+      }
+    ]
+  },
+  {
+    "file": "byterange-negative-entry.pdf",
+    "error": null,
+    "primary": {
+      "indication": "TOTAL_FAILED",
+      "subIndication": "FORMAT_FAILURE",
+      "id": "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147"
+    },
+    "all": [
+      {
+        "indication": "TOTAL_FAILED",
+        "subIndication": "FORMAT_FAILURE",
+        "id": "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147"
+      },
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+      },
+      {
+        "indication": "FAILED",
+        "subIndication": "HASH_FAILURE",
+        "id": "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67"
+      }
+    ]
+  },
+  {
+    "file": "control-valid.pdf",
+    "error": null,
+    "primary": {
+      "indication": "INDETERMINATE",
+      "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+      "id": "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147"
+    },
+    "all": [
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147"
+      },
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+      },
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67"
+      }
+    ]
+  },
+  {
+    "file": "duplicate-field-reference-later-revision.pdf",
+    "error": null,
+    "primary": {
+      "indication": "TOTAL_FAILED",
+      "subIndication": "FORMAT_FAILURE",
+      "id": "S-D6A40F9153E2D09852FD01AF1A33995F7ABE1F06C270798B9E8F6273A6CD647B"
+    },
+    "all": [
+      {
+        "indication": "TOTAL_FAILED",
+        "subIndication": "FORMAT_FAILURE",
+        "id": "S-D6A40F9153E2D09852FD01AF1A33995F7ABE1F06C270798B9E8F6273A6CD647B"
+      },
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "T-98CC507B0557349131A29F0B2AE80C7C68C9D85F243DD8FBD9BE37646869DC7E"
+      },
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67"
+      }
+    ]
+  },
+  {
+    "file": "field-name-changed-after-signing.pdf",
+    "error": null,
+    "primary": {
+      "indication": "TOTAL_FAILED",
+      "subIndication": "FORMAT_FAILURE",
+      "id": "S-C785D689C828986091AB4F6518E2D78E18DC850BA84B5FEA6FCB339193F45BB0"
+    },
+    "all": [
+      {
+        "indication": "TOTAL_FAILED",
+        "subIndication": "FORMAT_FAILURE",
+        "id": "S-C785D689C828986091AB4F6518E2D78E18DC850BA84B5FEA6FCB339193F45BB0"
+      },
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "T-3D18835A01977A38A2AE5CBEADB3F8F6EE99AA5715C9751354F913EB4EDF24F7"
+      },
+      {
+        "indication": "INDETERMINATE",
+        "subIndication": "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "id": "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67"
+      }
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[package]
+name = "sd_trust_kit"
+version = "1.0.0"
+edition = "2021"
+authors = ["Backup Experts SRL"]
+license = "LGPL-2.1-or-later"
+publish = false
+
+[lib]
+name = "sd_trust_kit"
+path = "src/lib.rs"
+crate-type = ["rlib", "staticlib", "cdylib"]
+
+[[bin]]
+name = "sd-trust-validate"
+path = "src/main.rs"
+
+[dependencies]
+base64 = "0.22"
+bp256 = { version = "0.14.0-rc.8", features = ["arithmetic", "ecdsa"] }
+ecdsa17 = { package = "ecdsa", version = "0.17.0-rc.18", default-features = false, features = ["algorithm", "der", "hazmat"] }
+flate2 = "1"
+hex = "0.4"
+md-5 = "0.10"
+p256 = { version = "0.13", features = ["ecdsa"] }
+p384 = { version = "0.13", features = ["ecdsa"] }
+rsa = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha1 = { version = "0.10", features = ["oid"] }
+sha2 = { version = "0.10", features = ["oid"] }
+signature = "2"

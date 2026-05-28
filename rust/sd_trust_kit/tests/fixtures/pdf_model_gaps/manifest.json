@@ -1,0 +1,29 @@
+{
+  "source": "/Users/cristian/Development/pdf-generator/output/20260523-190456/control-valid.pdf",
+  "trustAnchors": [
+    "root.cert.pem",
+    "tsa-root.cert.pem"
+  ],
+  "cases": [
+    {
+      "file": "control-valid.pdf",
+      "expected": "valid control"
+    },
+    {
+      "file": "byterange-decimal-entry.pdf",
+      "expected": "EU-DSS TOTAL_FAILED / FORMAT_FAILURE"
+    },
+    {
+      "file": "byterange-negative-entry.pdf",
+      "expected": "EU-DSS TOTAL_FAILED / FORMAT_FAILURE"
+    },
+    {
+      "file": "duplicate-field-reference-later-revision.pdf",
+      "expected": "EU-DSS TOTAL_FAILED / FORMAT_FAILURE"
+    },
+    {
+      "file": "field-name-changed-after-signing.pdf",
+      "expected": "EU-DSS TOTAL_FAILED / FORMAT_FAILURE"
+    }
+  ]
+}

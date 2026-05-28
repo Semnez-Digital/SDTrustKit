@@ -1,0 +1,11 @@
+target/
+**/target/
+**/.build/
+__pycache__/
+**/__pycache__/
+
+validation-corpus/
+
+.DS_Store
+*.swp
+*.swo

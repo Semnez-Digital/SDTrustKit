@@ -1,0 +1,3075 @@
+{
+  "file" : "sources/byterange-negative-entry.pdf",
+  "validator" : "EU DSS 6.2",
+  "trust" : "pdf-generator roots + TSA root",
+  "revocation_checking" : true,
+  "file_size" : 28925,
+  "sha256" : "c439df587798988facd00629db9afa150503b6a7861d319f967b064f63c39749",
+  "diagnosticData" : {
+    "DocumentName" : "byterange-negative-entry.pdf",
+    "ValidationDate" : "2026-05-27T19:43:06Z",
+    "Signatures" : {
+      "Signature" : {
+        "Id" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147",
+        "SignatureFilename" : "byterange-negative-entry.pdf",
+        "ClaimedSigningTime" : "2026-05-23T16:04:56Z",
+        "SignatureFormat" : "PAdES-BASELINE-T",
+        "StructuralValidation" : {
+          "valid" : "true"
+        },
+        "DigestMatchers" : {
+          "DigestMatcher" : {
+            "type" : "MESSAGE_DIGEST",
+            "DigestMethod" : "SHA256",
+            "DigestValue" : "RmUporfK1sLk7oEr+7K3FfqtrjTo1p03Pa2/4iF3gJQ=",
+            "DataFound" : "true",
+            "DataIntact" : "false"
+          }
+        },
+        "BasicSignature" : {
+          "EncryptionAlgoUsedToSignThisToken" : "RSA",
+          "KeyLengthUsedToSignThisToken" : "2048",
+          "DigestAlgoUsedToSignThisToken" : "SHA256",
+          "SignatureIntact" : "false",
+          "SignatureValid" : "false"
+        },
+        "SigningCertificate" : {
+          "Certificate" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B"
+        },
+        "CertificateChain" : {
+          "ChainItem" : [ {
+            "Certificate" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B"
+          }, {
+            "Certificate" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F"
+          }, {
+            "Certificate" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193"
+          } ]
+        },
+        "ContentType" : "1.2.840.113549.1.7.1",
+        "CommitmentTypeIndications" : "",
+        "SignerInformationStore" : {
+          "SignerInfo" : {
+            "Current" : "true",
+            "IssuerName" : "CN=pdfgen Intermediate CA, O=pdfgen test PKI, C=EU",
+            "SerialNumber" : "768"
+          }
+        },
+        "PDFRevision" : {
+          "SignatureField" : {
+            "name" : "Signature1"
+          },
+          "PDFSignatureDictionary" : {
+            "consistent" : "true",
+            "Type" : "Sig",
+            "Filter" : "Adobe.PPKLite",
+            "SubFilter" : "ETSI.CAdES.detached",
+            "SignatureByteRange" : {
+              "valid" : "false",
+              "" : "-1 418 19470 512"
+            }
+          },
+          "ModificationDetection" : {
+            "ObjectModifications" : {
+              "ExtensionChange" : [ {
+                "action" : "CREATION",
+                "fieldName" : "Timestamp-3d9b04b5-f196-43d1-9c6a-c4143ae5b276",
+                "type" : "DocTimeStamp",
+                "" : "/Catalog /Pages 9 0 R /Kids 5 0 R /Annots 17 0 R"
+              }, {
+                "action" : "CREATION",
+                "fieldName" : "Timestamp-3d9b04b5-f196-43d1-9c6a-c4143ae5b276",
+                "type" : "DocTimeStamp",
+                "" : "/Catalog /AcroForm 13 0 R /Fields 17 0 R"
+              } ]
+            }
+          }
+        },
+        "SignerDocumentRepresentations" : {
+          "HashOnly" : "false",
+          "DocHashOnly" : "false"
+        },
+        "FoundCertificates" : {
+          "RelatedCertificate" : [ {
+            "Certificate" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F",
+            "Origin" : "SIGNED_DATA"
+          }, {
+            "Certificate" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+            "Origin" : "SIGNED_DATA",
+            "CertificateRef" : {
+              "Origin" : "SIGNING_CERTIFICATE",
+              "IssuerSerial" : {
+                "match" : "true",
+                "" : "MFIwTKRKMEgxCzAJBgNVBAYTAkVVMRgwFgYDVQQKDA9wZGZnZW4gdGVzdCBQS0kxHzAdBgNVBAMMFnBkZmdlbiBJbnRlcm1lZGlhdGUgQ0ECAgMA"
+              },
+              "DigestAlgoAndValue" : {
+                "match" : "true",
+                "DigestMethod" : "SHA256",
+                "DigestValue" : "T8KRWePtrCM/OgmaHSHxM67jvR51r6nkBHXSHXieTXs="
+              }
+            }
+          } ]
+        },
+        "FoundRevocations" : "",
+        "FoundTimestamps" : {
+          "FoundTimestamp" : [ {
+            "Timestamp" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+          }, {
+            "Timestamp" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67"
+          } ]
+        },
+        "FoundEvidenceRecords" : "",
+        "SignatureScopes" : {
+          "SignatureScope" : {
+            "SignerData" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568",
+            "Scope" : "PARTIAL",
+            "Name" : "Partial PDF",
+            "Description" : "The document ByteRange : [-1, 418, 19470, 512]"
+          }
+        },
+        "SignatureDigestReference" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "OwgsIq9v1t6uIKLdZrx1CnuVekazhCdenVuqbdjeoDU="
+        },
+        "DataToBeSignedRepresentation" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "P4H4wGg4+34gix44Y8dJ1AnEG8WhgmsdbVjLGxjP/lY="
+        },
+        "SignatureValue" : "oj2uAv48NVHtX04zNlebmLZ/ul/Yb+zV1O/BPjGgTTdYWJXK2QtgeFWpeg+Mkvz1Nrfom5Twr9clY+AC6FV3MSSEU9w06fhn+6raY9v9zYKf26ryHwCRE9oBomKvX0OuLiASGwbiXAWkXtyKkEjQfJWHYHg0FdWiRR6mqEy94Zoi3T7kLeMK9igIFLbODc7Coe8cxcdaNDQggyyyNxkd4pAD1+dWNPPpFYsqXQiyo9BqTq+53/AUK405ofJjn6I26VGuBdXqKwQ/H5gQMP+abSCESKIb6UE1vUJlA/C/D9Yw4KoyRjNq2htlzTDHcIP8nq5WdZXhcJ2tIAT4vAimvw=="
+      }
+    },
+    "EvidenceRecords" : "",
+    "UsedCertificates" : {
+      "Certificate" : [ {
+        "Id" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F",
+        "SubjectDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen intermediate ca,o=pdfgen test pki,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen Intermediate CA,O=pdfgen test PKI,C=EU"
+        } ],
+        "IssuerDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen root ca,o=pdfgen test pki,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen Root CA,O=pdfgen test PKI,C=EU"
+        } ],
+        "SerialNumber" : "512",
+        "CommonName" : "pdfgen Intermediate CA",
+        "CountryName" : "EU",
+        "OrganizationName" : "pdfgen test PKI",
+        "Sources" : {
+          "Source" : "SIGNATURE"
+        },
+        "NotAfter" : "2036-05-20T16:04:56Z",
+        "NotBefore" : "2026-05-22T16:04:56Z",
+        "PublicKeySize" : "2048",
+        "PublicKeyEncryptionAlgo" : "RSA",
+        "EntityKey" : "EK-028BCC7F70892286D92C95361C40AD15B6D0FF7B74578B6558C0C3522E863B4B",
+        "IssuerEntityKey" : {
+          "key" : "true",
+          "subjectName" : "true",
+          "" : "EK-A3DD27E3DB9C9ECB4726F26D441B1D8FAF5CEC418E38F85C0AFE08A0A87B6C96"
+        },
+        "BasicSignature" : {
+          "EncryptionAlgoUsedToSignThisToken" : "RSA",
+          "KeyLengthUsedToSignThisToken" : "2048",
+          "DigestAlgoUsedToSignThisToken" : "SHA256",
+          "SignatureIntact" : "true",
+          "SignatureValid" : "true"
+        },
+        "SigningCertificate" : {
+          "Certificate" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193"
+        },
+        "CertificateChain" : {
+          "ChainItem" : {
+            "Certificate" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193"
+          }
+        },
+        "Trusted" : "false",
+        "SelfSigned" : "false",
+        "CertificateExtensions" : {
+          "AuthorityKeyIdentifier" : {
+            "OID" : "2.5.29.35",
+            "critical" : "false",
+            "keyIdentifier" : "BhHnQ2BQLIYatkmQqEHMIswHShE="
+          },
+          "SubjectKeyIdentifier" : {
+            "OID" : "2.5.29.14",
+            "critical" : "false",
+            "ski" : "HFlZYdJ1rCmNnZkdBruMd6vGNI8="
+          },
+          "BasicConstraints" : {
+            "CA" : "true",
+            "pathLenConstraint" : "0",
+            "OID" : "2.5.29.19",
+            "critical" : "true"
+          },
+          "KeyUsages" : {
+            "OID" : "2.5.29.15",
+            "critical" : "true",
+            "keyUsageBit" : [ "keyCertSign", "crlSign" ]
+          }
+        },
+        "Revocations" : "",
+        "DigestAlgoAndValue" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "M8CSTzXOsI4Rhv/xRgK1b7YGMqoTH7s4PT5Ib1T8SF8="
+        }
+      }, {
+        "Id" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+        "SubjectDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen signer,o=pdfgen test pki,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen Signer,O=pdfgen test PKI,C=EU"
+        } ],
+        "IssuerDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen intermediate ca,o=pdfgen test pki,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen Intermediate CA,O=pdfgen test PKI,C=EU"
+        } ],
+        "SerialNumber" : "768",
+        "CommonName" : "pdfgen Signer",
+        "CountryName" : "EU",
+        "OrganizationName" : "pdfgen test PKI",
+        "Sources" : {
+          "Source" : "SIGNATURE"
+        },
+        "NotAfter" : "2027-05-23T16:04:56Z",
+        "NotBefore" : "2026-05-22T16:04:56Z",
+        "PublicKeySize" : "2048",
+        "PublicKeyEncryptionAlgo" : "RSA",
+        "EntityKey" : "EK-F917EAC743D3214693174DE60A263137E28BDEE4A32B7AA1FAC9D7D498601BA5",
+        "IssuerEntityKey" : {
+          "key" : "true",
+          "subjectName" : "true",
+          "" : "EK-028BCC7F70892286D92C95361C40AD15B6D0FF7B74578B6558C0C3522E863B4B"
+        },
+        "BasicSignature" : {
+          "EncryptionAlgoUsedToSignThisToken" : "RSA",
+          "KeyLengthUsedToSignThisToken" : "2048",
+          "DigestAlgoUsedToSignThisToken" : "SHA256",
+          "SignatureIntact" : "true",
+          "SignatureValid" : "true"
+        },
+        "SigningCertificate" : {
+          "Certificate" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F"
+        },
+        "CertificateChain" : {
+          "ChainItem" : [ {
+            "Certificate" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F"
+          }, {
+            "Certificate" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193"
+          } ]
+        },
+        "Trusted" : "false",
+        "SelfSigned" : "false",
+        "CertificateExtensions" : {
+          "AuthorityKeyIdentifier" : {
+            "OID" : "2.5.29.35",
+            "critical" : "false",
+            "keyIdentifier" : "HFlZYdJ1rCmNnZkdBruMd6vGNI8="
+          },
+          "SubjectKeyIdentifier" : {
+            "OID" : "2.5.29.14",
+            "critical" : "false",
+            "ski" : "vRDFUZl7PrFvnNIoOXCxgfnshvg="
+          },
+          "BasicConstraints" : {
+            "CA" : "false",
+            "OID" : "2.5.29.19",
+            "critical" : "true"
+          },
+          "KeyUsages" : {
+            "OID" : "2.5.29.15",
+            "critical" : "true",
+            "keyUsageBit" : [ "digitalSignature", "nonRepudiation" ]
+          },
+          "CRLDistributionPoints" : {
+            "OID" : "2.5.29.31",
+            "critical" : "false",
+            "crlUrl" : "http://localhost:8889/20260523-190456/control-valid/crl/intermediate.crl"
+          }
+        },
+        "TrustServiceProviders" : "",
+        "Revocations" : "",
+        "DigestAlgoAndValue" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "T8KRWePtrCM/OgmaHSHxM67jvR51r6nkBHXSHXieTXs="
+        }
+      }, {
+        "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+        "SubjectDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen tsa root ca,o=pdfgen test tsa,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen TSA Root CA,O=pdfgen test TSA,C=EU"
+        } ],
+        "IssuerDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen tsa root ca,o=pdfgen test tsa,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen TSA Root CA,O=pdfgen test TSA,C=EU"
+        } ],
+        "SerialNumber" : "31232",
+        "CommonName" : "pdfgen TSA Root CA",
+        "CountryName" : "EU",
+        "OrganizationName" : "pdfgen test TSA",
+        "Sources" : {
+          "Source" : [ "TRUSTED_STORE", "TIMESTAMP" ]
+        },
+        "NotAfter" : "2036-05-20T15:55:33Z",
+        "NotBefore" : "2026-05-22T15:55:33Z",
+        "PublicKeySize" : "2048",
+        "PublicKeyEncryptionAlgo" : "RSA",
+        "EntityKey" : "EK-88C7ABF9F5C8A23CAB6DA10E22FD51C45DF9991FF4E421316A07EAECFD6308C0",
+        "IssuerEntityKey" : {
+          "key" : "true",
+          "subjectName" : "true",
+          "" : "EK-88C7ABF9F5C8A23CAB6DA10E22FD51C45DF9991FF4E421316A07EAECFD6308C0"
+        },
+        "BasicSignature" : {
+          "EncryptionAlgoUsedToSignThisToken" : "RSA",
+          "KeyLengthUsedToSignThisToken" : "2048",
+          "DigestAlgoUsedToSignThisToken" : "SHA256",
+          "SignatureIntact" : "true",
+          "SignatureValid" : "true"
+        },
+        "CertificateChain" : "",
+        "Trusted" : "true",
+        "SelfSigned" : "true",
+        "CertificateExtensions" : {
+          "SubjectKeyIdentifier" : {
+            "OID" : "2.5.29.14",
+            "critical" : "false",
+            "ski" : "9SoDZxUT4QLs9GBIcCm8ARrTsM8="
+          },
+          "BasicConstraints" : {
+            "CA" : "true",
+            "pathLenConstraint" : "2147483647",
+            "OID" : "2.5.29.19",
+            "critical" : "true"
+          },
+          "KeyUsages" : {
+            "OID" : "2.5.29.15",
+            "critical" : "true",
+            "keyUsageBit" : [ "keyCertSign", "crlSign" ]
+          }
+        },
+        "TrustServiceProviders" : "",
+        "DigestAlgoAndValue" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "k7zhvB+d0G6s3dz3bTsqNJlwONdEx/j4VRR+pAULPo4="
+        }
+      }, {
+        "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+        "SubjectDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen tsa good,o=pdfgen test tsa,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen TSA good,O=pdfgen test TSA,C=EU"
+        } ],
+        "IssuerDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen tsa root ca,o=pdfgen test tsa,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen TSA Root CA,O=pdfgen test TSA,C=EU"
+        } ],
+        "SerialNumber" : "31248",
+        "CommonName" : "pdfgen TSA good",
+        "CountryName" : "EU",
+        "OrganizationName" : "pdfgen test TSA",
+        "Sources" : {
+          "Source" : "TIMESTAMP"
+        },
+        "NotAfter" : "2027-05-23T15:55:33Z",
+        "NotBefore" : "2026-05-22T15:55:33Z",
+        "PublicKeySize" : "2048",
+        "PublicKeyEncryptionAlgo" : "RSA",
+        "EntityKey" : "EK-B5C78D72440CFBAF92BBA645259B6AC0C72AB107382293277F99DAF9A5589038",
+        "IssuerEntityKey" : {
+          "key" : "true",
+          "subjectName" : "true",
+          "" : "EK-88C7ABF9F5C8A23CAB6DA10E22FD51C45DF9991FF4E421316A07EAECFD6308C0"
+        },
+        "BasicSignature" : {
+          "EncryptionAlgoUsedToSignThisToken" : "RSA",
+          "KeyLengthUsedToSignThisToken" : "2048",
+          "DigestAlgoUsedToSignThisToken" : "SHA256",
+          "SignatureIntact" : "true",
+          "SignatureValid" : "true"
+        },
+        "SigningCertificate" : {
+          "Certificate" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+        },
+        "CertificateChain" : {
+          "ChainItem" : {
+            "Certificate" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+          }
+        },
+        "Trusted" : "false",
+        "SelfSigned" : "false",
+        "CertificateExtensions" : {
+          "SubjectKeyIdentifier" : {
+            "OID" : "2.5.29.14",
+            "critical" : "false",
+            "ski" : "tsn6hld9OKImnApjWXVpUw3v1c4="
+          },
+          "BasicConstraints" : {
+            "CA" : "false",
+            "OID" : "2.5.29.19",
+            "critical" : "true"
+          },
+          "KeyUsages" : {
+            "OID" : "2.5.29.15",
+            "critical" : "true",
+            "keyUsageBit" : [ "digitalSignature", "nonRepudiation" ]
+          },
+          "ExtendedKeyUsages" : {
+            "OID" : "2.5.29.37",
+            "critical" : "true",
+            "extendedKeyUsageOid" : {
+              "Description" : "timeStamping",
+              "" : "1.3.6.1.5.5.7.3.8"
+            }
+          }
+        },
+        "TrustServiceProviders" : "",
+        "Revocations" : "",
+        "DigestAlgoAndValue" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "1BCR2Ox3v4t9dHimTRnEFbY7RHBIG4IhbXhZtUEoeos="
+        }
+      }, {
+        "Id" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193",
+        "SubjectDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen root ca,o=pdfgen test pki,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen Root CA,O=pdfgen test PKI,C=EU"
+        } ],
+        "IssuerDistinguishedName" : [ {
+          "Format" : "CANONICAL",
+          "" : "cn=pdfgen root ca,o=pdfgen test pki,c=eu"
+        }, {
+          "Format" : "RFC2253",
+          "" : "CN=pdfgen Root CA,O=pdfgen test PKI,C=EU"
+        } ],
+        "SerialNumber" : "256",
+        "CommonName" : "pdfgen Root CA",
+        "CountryName" : "EU",
+        "OrganizationName" : "pdfgen test PKI",
+        "Sources" : {
+          "Source" : "TRUSTED_STORE"
+        },
+        "NotAfter" : "2036-05-20T16:04:56Z",
+        "NotBefore" : "2026-05-22T16:04:56Z",
+        "PublicKeySize" : "2048",
+        "PublicKeyEncryptionAlgo" : "RSA",
+        "EntityKey" : "EK-A3DD27E3DB9C9ECB4726F26D441B1D8FAF5CEC418E38F85C0AFE08A0A87B6C96",
+        "IssuerEntityKey" : {
+          "key" : "true",
+          "subjectName" : "true",
+          "" : "EK-A3DD27E3DB9C9ECB4726F26D441B1D8FAF5CEC418E38F85C0AFE08A0A87B6C96"
+        },
+        "BasicSignature" : {
+          "EncryptionAlgoUsedToSignThisToken" : "RSA",
+          "KeyLengthUsedToSignThisToken" : "2048",
+          "DigestAlgoUsedToSignThisToken" : "SHA256",
+          "SignatureIntact" : "true",
+          "SignatureValid" : "true"
+        },
+        "CertificateChain" : "",
+        "Trusted" : "true",
+        "SelfSigned" : "true",
+        "CertificateExtensions" : {
+          "AuthorityKeyIdentifier" : {
+            "OID" : "2.5.29.35",
+            "critical" : "false",
+            "keyIdentifier" : "BhHnQ2BQLIYatkmQqEHMIswHShE="
+          },
+          "SubjectKeyIdentifier" : {
+            "OID" : "2.5.29.14",
+            "critical" : "false",
+            "ski" : "BhHnQ2BQLIYatkmQqEHMIswHShE="
+          },
+          "BasicConstraints" : {
+            "CA" : "true",
+            "pathLenConstraint" : "2147483647",
+            "OID" : "2.5.29.19",
+            "critical" : "true"
+          },
+          "KeyUsages" : {
+            "OID" : "2.5.29.15",
+            "critical" : "true",
+            "keyUsageBit" : [ "keyCertSign", "crlSign" ]
+          }
+        },
+        "TrustServiceProviders" : "",
+        "DigestAlgoAndValue" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "6vFBBjbg2iyY3/jIDpy9I1vnb5pu0pIZf7YIH0Fo4ZM="
+        }
+      } ]
+    },
+    "UsedRevocations" : "",
+    "UsedTimestamps" : {
+      "Timestamp" : [ {
+        "Type" : "SIGNATURE_TIMESTAMP",
+        "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70",
+        "ProductionTime" : "2026-05-23T16:04:56Z",
+        "DigestMatcher" : {
+          "type" : "MESSAGE_IMPRINT",
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "sJHJcgXgFcmEhkfyuinOhBpwA7EZ6TIC/otqWb84TRU=",
+          "DataFound" : "true",
+          "DataIntact" : "true"
+        },
+        "BasicSignature" : {
+          "EncryptionAlgoUsedToSignThisToken" : "RSA",
+          "KeyLengthUsedToSignThisToken" : "2048",
+          "DigestAlgoUsedToSignThisToken" : "SHA256",
+          "SignatureIntact" : "true",
+          "SignatureValid" : "true"
+        },
+        "SigningCertificate" : {
+          "Certificate" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+        },
+        "CertificateChain" : {
+          "ChainItem" : [ {
+            "Certificate" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+          }, {
+            "Certificate" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+          } ]
+        },
+        "SignerInformationStore" : {
+          "SignerInfo" : {
+            "Current" : "true",
+            "IssuerName" : "CN=pdfgen TSA Root CA, O=pdfgen test TSA, C=EU",
+            "SerialNumber" : "31248"
+          }
+        },
+        "TSAGeneralName" : {
+          "contentMatch" : "true",
+          "orderMatch" : "true",
+          "" : "CN=pdfgen TSA good,O=pdfgen test TSA,C=EU"
+        },
+        "FoundCertificates" : {
+          "RelatedCertificate" : [ {
+            "Certificate" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+            "Origin" : "SIGNED_DATA",
+            "CertificateRef" : {
+              "Origin" : "SIGNING_CERTIFICATE",
+              "IssuerSerial" : {
+                "match" : "true",
+                "" : "ME4wSKRGMEQxCzAJBgNVBAYTAkVVMRgwFgYDVQQKDA9wZGZnZW4gdGVzdCBUU0ExGzAZBgNVBAMMEnBkZmdlbiBUU0EgUm9vdCBDQQICehA="
+              },
+              "DigestAlgoAndValue" : {
+                "match" : "true",
+                "DigestMethod" : "SHA1",
+                "DigestValue" : "cKgYQPEh2d66BvfMKnyAxQZNyRA="
+              }
+            }
+          }, {
+            "Certificate" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+            "Origin" : "SIGNED_DATA"
+          } ]
+        },
+        "FoundRevocations" : "",
+        "FoundEvidenceRecords" : "",
+        "TimestampedObjects" : {
+          "TimestampedObject" : [ {
+            "Token" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568",
+            "Category" : "SIGNED_DATA"
+          }, {
+            "Token" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147",
+            "Category" : "SIGNATURE"
+          }, {
+            "Token" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+            "Category" : "CERTIFICATE"
+          } ]
+        },
+        "TimestampScopes" : "",
+        "DigestAlgoAndValue" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "QWPoeSCb9QrzK1g0qAxqveCJi4DjKa+0X4yaIeIwzWM="
+        }
+      }, {
+        "Type" : "DOCUMENT_TIMESTAMP",
+        "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67",
+        "ProductionTime" : "2026-05-23T16:04:56Z",
+        "DigestMatcher" : {
+          "type" : "MESSAGE_IMPRINT",
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "QSTutEgaEW5p0gaNEfbKuxCowSz64tPaQtjlJhXwPmE=",
+          "DataFound" : "true",
+          "DataIntact" : "false"
+        },
+        "BasicSignature" : {
+          "EncryptionAlgoUsedToSignThisToken" : "RSA",
+          "KeyLengthUsedToSignThisToken" : "2048",
+          "DigestAlgoUsedToSignThisToken" : "SHA256",
+          "SignatureIntact" : "true",
+          "SignatureValid" : "false"
+        },
+        "SigningCertificate" : {
+          "Certificate" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+        },
+        "CertificateChain" : {
+          "ChainItem" : [ {
+            "Certificate" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+          }, {
+            "Certificate" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+          } ]
+        },
+        "SignerInformationStore" : {
+          "SignerInfo" : {
+            "Current" : "true",
+            "IssuerName" : "CN=pdfgen TSA Root CA, O=pdfgen test TSA, C=EU",
+            "SerialNumber" : "31248"
+          }
+        },
+        "TSAGeneralName" : {
+          "contentMatch" : "true",
+          "orderMatch" : "true",
+          "" : "CN=pdfgen TSA good,O=pdfgen test TSA,C=EU"
+        },
+        "PDFRevision" : {
+          "SignatureField" : {
+            "name" : "Timestamp-3d9b04b5-f196-43d1-9c6a-c4143ae5b276"
+          },
+          "PDFSignatureDictionary" : {
+            "consistent" : "true",
+            "Type" : "DocTimeStamp",
+            "Filter" : "Adobe.PPKLite",
+            "SubFilter" : "ETSI.RFC3161",
+            "SignatureByteRange" : {
+              "valid" : "true",
+              "" : "0 20766 28466 459"
+            }
+          }
+        },
+        "FoundCertificates" : {
+          "RelatedCertificate" : [ {
+            "Certificate" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+            "Origin" : "SIGNED_DATA",
+            "CertificateRef" : {
+              "Origin" : "SIGNING_CERTIFICATE",
+              "IssuerSerial" : {
+                "match" : "true",
+                "" : "ME4wSKRGMEQxCzAJBgNVBAYTAkVVMRgwFgYDVQQKDA9wZGZnZW4gdGVzdCBUU0ExGzAZBgNVBAMMEnBkZmdlbiBUU0EgUm9vdCBDQQICehA="
+              },
+              "DigestAlgoAndValue" : {
+                "match" : "true",
+                "DigestMethod" : "SHA1",
+                "DigestValue" : "cKgYQPEh2d66BvfMKnyAxQZNyRA="
+              }
+            }
+          }, {
+            "Certificate" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+            "Origin" : "SIGNED_DATA"
+          } ]
+        },
+        "FoundRevocations" : "",
+        "FoundEvidenceRecords" : "",
+        "TimestampedObjects" : {
+          "TimestampedObject" : [ {
+            "Token" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568",
+            "Category" : "SIGNED_DATA"
+          }, {
+            "Token" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147",
+            "Category" : "SIGNATURE"
+          }, {
+            "Token" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+            "Category" : "CERTIFICATE"
+          }, {
+            "Token" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F",
+            "Category" : "CERTIFICATE"
+          }, {
+            "Token" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70",
+            "Category" : "TIMESTAMP"
+          }, {
+            "Token" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+            "Category" : "CERTIFICATE"
+          }, {
+            "Token" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+            "Category" : "CERTIFICATE"
+          } ]
+        },
+        "TimestampScopes" : "",
+        "DigestAlgoAndValue" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "KgfLD96w1Xk9qzYgrUkgaRA+8U+OTje/v+IbPl4bxfY="
+        }
+      } ]
+    },
+    "OriginalDocuments" : {
+      "SignerData" : {
+        "Id" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568",
+        "ReferencedName" : "Partial PDF",
+        "DigestAlgoAndValue" : {
+          "DigestMethod" : "SHA256",
+          "DigestValue" : "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        }
+      }
+    },
+    "TrustedLists" : ""
+  },
+  "simpleReport" : {
+    "ValidationTime" : "2026-05-27T19:43:06Z",
+    "ValidationPolicy" : {
+      "PolicyName" : "QES AdESQC TL based",
+      "PolicyDescription" : "Validates electronic signatures and indicates whether they are Advanced electronic Signatures (AdES), AdES supported by a Qualified Certificate (AdES/QC) or a\n\t\tQualified electronic Signature (QES). All certificates and their related chains supporting the signatures are validated against the EU Member State Trusted Lists (this includes\n\t\tsigner's certificate and certificates used to validate certificate validity status services - CRLs, OCSP, and time-stamps).\n\t"
+    },
+    "DocumentName" : "byterange-negative-entry.pdf",
+    "ValidSignaturesCount" : "0",
+    "SignaturesCount" : "1",
+    "Signature" : {
+      "SignatureFormat" : "PAdES-BASELINE-T",
+      "Id" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147",
+      "CertificateChain" : {
+        "Certificate" : [ {
+          "Id" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+          "QualifiedName" : "pdfgen Signer"
+        }, {
+          "Id" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F",
+          "QualifiedName" : "pdfgen Intermediate CA"
+        }, {
+          "Id" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193",
+          "trusted" : "true",
+          "QualifiedName" : "pdfgen Root CA"
+        } ]
+      },
+      "Indication" : "TOTAL_FAILED",
+      "SubIndication" : "FORMAT_FAILURE",
+      "AdESValidationDetails" : {
+        "Error" : [ {
+          "Key" : "BBB_FC_IBRV_ANS",
+          "" : "The /ByteRange dictionary is not consistent!"
+        }, {
+          "Key" : "BBB_XCV_SUB_ANS",
+          "" : "The certificate validation is not conclusive!"
+        }, {
+          "Key" : "BBB_XCV_IRDPFC_ANS",
+          "" : "No revocation data found for the certificate!"
+        }, {
+          "Key" : "BBB_CV_IRDOI_ANS",
+          "" : "The reference data object is not intact!"
+        } ],
+        "Warning" : {
+          "Key" : "BBB_XCV_AIA_PRES_ANS",
+          "" : "The authority info access is not present!"
+        }
+      },
+      "QualificationDetails" : {
+        "Error" : {
+          "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+          "" : "Unable to build a certificate chain up to a trusted list!"
+        },
+        "Warning" : {
+          "Key" : "QUAL_IS_ADES_INV",
+          "" : "The signature/seal is not a valid AdES digital signature!"
+        }
+      },
+      "SigningTime" : "2026-05-23T16:04:56Z",
+      "BestSignatureTime" : "2026-05-27T19:43:06Z",
+      "SignedBy" : "pdfgen Signer",
+      "SignatureLevel" : {
+        "description" : "Not applicable",
+        "" : "N/A"
+      },
+      "SignatureScope" : {
+        "Id" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568",
+        "name" : "Partial PDF",
+        "scope" : "PARTIAL",
+        "" : "The document ByteRange : [-1, 418, 19470, 512]"
+      },
+      "Timestamps" : {
+        "Timestamp" : [ {
+          "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70",
+          "CertificateChain" : {
+            "Certificate" : [ {
+              "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+              "QualifiedName" : "pdfgen TSA good"
+            }, {
+              "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+              "trusted" : "true",
+              "QualifiedName" : "pdfgen TSA Root CA"
+            } ]
+          },
+          "Indication" : "INDETERMINATE",
+          "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+          "AdESValidationDetails" : {
+            "Error" : [ {
+              "Key" : "BBB_XCV_SUB_ANS",
+              "" : "The certificate validation is not conclusive!"
+            }, {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            } ]
+          },
+          "QualificationDetails" : {
+            "Error" : {
+              "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+              "" : "Unable to build a certificate chain up to a trusted list!"
+            }
+          },
+          "ProductionTime" : "2026-05-23T16:04:56Z",
+          "ProducedBy" : "pdfgen TSA good",
+          "TimestampLevel" : {
+            "description" : "Not applicable",
+            "" : "N/A"
+          }
+        }, {
+          "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67",
+          "CertificateChain" : {
+            "Certificate" : [ {
+              "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+              "QualifiedName" : "pdfgen TSA good"
+            }, {
+              "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+              "trusted" : "true",
+              "QualifiedName" : "pdfgen TSA Root CA"
+            } ]
+          },
+          "Indication" : "FAILED",
+          "SubIndication" : "HASH_FAILURE",
+          "AdESValidationDetails" : {
+            "Error" : [ {
+              "Key" : "BBB_XCV_SUB_ANS",
+              "" : "The certificate validation is not conclusive!"
+            }, {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }, {
+              "Key" : "BBB_CV_TSP_IRDOI_ANS",
+              "" : "The time-stamp message imprint is not intact!"
+            } ]
+          },
+          "QualificationDetails" : {
+            "Error" : {
+              "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+              "" : "Unable to build a certificate chain up to a trusted list!"
+            }
+          },
+          "ProductionTime" : "2026-05-23T16:04:56Z",
+          "ProducedBy" : "pdfgen TSA good",
+          "TimestampLevel" : {
+            "description" : "Not applicable",
+            "" : "N/A"
+          }
+        } ]
+      }
+    }
+  },
+  "detailedReport" : {
+    "ValidationTime" : "2026-05-27T19:43:06Z",
+    "Signature" : {
+      "Id" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147",
+      "ValidationProcessBasicSignature" : {
+        "Title" : "Validation Process for Basic Signatures",
+        "Constraint" : {
+          "Id" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147-FC",
+          "Name" : {
+            "Key" : "BSV_IFCRC",
+            "" : "Is the result of the 'Format Checking' building block conclusive?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "BSV_IFCRC_ANS",
+            "" : "The result of the 'Format Checking' building block is not conclusive!"
+          }
+        },
+        "Conclusion" : {
+          "Indication" : "FAILED",
+          "SubIndication" : "FORMAT_FAILURE",
+          "Errors" : [ {
+            "Key" : "BBB_FC_IBRV_ANS",
+            "" : "The /ByteRange dictionary is not consistent!"
+          }, {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          }, {
+            "Key" : "BBB_CV_IRDOI_ANS",
+            "" : "The reference data object is not intact!"
+          } ],
+          "Warnings" : {
+            "Key" : "BBB_XCV_AIA_PRES_ANS",
+            "" : "The authority info access is not present!"
+          }
+        },
+        "ProofOfExistence" : {
+          "Time" : "2026-05-27T19:43:06Z"
+        }
+      },
+      "Timestamp" : [ {
+        "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70",
+        "ValidationProcessBasicTimestamp" : {
+          "Type" : "SIGNATURE_TIMESTAMP",
+          "ProductionTime" : "2026-05-23T16:04:56Z",
+          "Title" : "Validation Process for Basic Time-stamps",
+          "Constraint" : [ {
+            "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70-ISC",
+            "Name" : {
+              "Key" : "BSV_IISCRC",
+              "" : "Is the result of the 'Identification of Signing Certificate' building block conclusive?"
+            },
+            "Status" : "OK"
+          }, {
+            "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70-XCV",
+            "Name" : {
+              "Key" : "BSV_IXCVRC",
+              "" : "Is the result of the 'X.509 Certificate Validation' building block conclusive?"
+            },
+            "Status" : "WARNING",
+            "Warning" : {
+              "Key" : "BSV_IXCVRC_ANS",
+              "" : "The result of the 'X.509 Certificate Validation' building block is not conclusive!"
+            }
+          }, {
+            "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70-XCV",
+            "Name" : {
+              "Key" : "BSV_ISCRAVTC",
+              "" : "Is the signing certificate not revoked at validation time?"
+            },
+            "Status" : "OK"
+          }, {
+            "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70-XCV",
+            "Name" : {
+              "Key" : "BSV_IVTAVRSC",
+              "" : "Is the validation time in the validity range of the signing certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70-CV",
+            "Name" : {
+              "Key" : "BSV_ICVRC",
+              "" : "Is the result of the 'Cryptographic Verification' building block conclusive?"
+            },
+            "Status" : "OK"
+          }, {
+            "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70",
+            "Name" : {
+              "Key" : "ADEST_ROBVPIIC",
+              "" : "Is the result of the Basic Validation Process conclusive?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "ADEST_ROBVPIIC_ANS",
+              "" : "The result of the Basic validation process is not conclusive!"
+            },
+            "AdditionalInfo" : "Basic Signature Validation process failed with INDETERMINATE/CERTIFICATE_CHAIN_GENERAL_FAILURE indication"
+          } ],
+          "Conclusion" : {
+            "Indication" : "INDETERMINATE",
+            "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+            "Errors" : [ {
+              "Key" : "BBB_XCV_SUB_ANS",
+              "" : "The certificate validation is not conclusive!"
+            }, {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            } ]
+          }
+        },
+        "ValidationProcessArchivalDataTimestamp" : {
+          "Title" : "Validation Process for Time-stamps with Archival Data",
+          "Constraint" : {
+            "BlockType" : "TST_BBB",
+            "Name" : {
+              "Key" : "ARCH_IRTVBBA",
+              "" : "Is the result of the Time-stamp Validation Building Block acceptable?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "ARCH_IRTVBBA_ANS",
+              "" : "The result of the Time-stamp Validation Building Block is not acceptable to continue the process!"
+            }
+          },
+          "Conclusion" : {
+            "Indication" : "INDETERMINATE",
+            "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+            "Errors" : [ {
+              "Key" : "BBB_XCV_SUB_ANS",
+              "" : "The certificate validation is not conclusive!"
+            }, {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            } ]
+          },
+          "ProofOfExistence" : {
+            "Time" : "2026-05-27T19:43:06Z"
+          }
+        },
+        "ValidationTimestampQualification" : {
+          "TimestampQualification" : "N/A",
+          "Title" : "Time-stamp Qualification",
+          "Constraint" : {
+            "Name" : {
+              "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED",
+              "" : "Has a trusted list been reached for the certificate chain?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+              "" : "Unable to build a certificate chain up to a trusted list!"
+            }
+          },
+          "Conclusion" : {
+            "Indication" : "FAILED",
+            "Errors" : {
+              "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+              "" : "Unable to build a certificate chain up to a trusted list!"
+            }
+          }
+        },
+        "Conclusion" : {
+          "Indication" : "INDETERMINATE",
+          "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+          "Errors" : [ {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          } ]
+        }
+      }, {
+        "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67",
+        "ValidationProcessBasicTimestamp" : {
+          "Type" : "DOCUMENT_TIMESTAMP",
+          "ProductionTime" : "2026-05-23T16:04:56Z",
+          "Title" : "Validation Process for Basic Time-stamps",
+          "Constraint" : [ {
+            "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67-FC",
+            "Name" : {
+              "Key" : "BSV_IFCRC",
+              "" : "Is the result of the 'Format Checking' building block conclusive?"
+            },
+            "Status" : "OK"
+          }, {
+            "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67-ISC",
+            "Name" : {
+              "Key" : "BSV_IISCRC",
+              "" : "Is the result of the 'Identification of Signing Certificate' building block conclusive?"
+            },
+            "Status" : "OK"
+          }, {
+            "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67-XCV",
+            "Name" : {
+              "Key" : "BSV_IXCVRC",
+              "" : "Is the result of the 'X.509 Certificate Validation' building block conclusive?"
+            },
+            "Status" : "WARNING",
+            "Warning" : {
+              "Key" : "BSV_IXCVRC_ANS",
+              "" : "The result of the 'X.509 Certificate Validation' building block is not conclusive!"
+            }
+          }, {
+            "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67-XCV",
+            "Name" : {
+              "Key" : "BSV_ISCRAVTC",
+              "" : "Is the signing certificate not revoked at validation time?"
+            },
+            "Status" : "OK"
+          }, {
+            "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67-XCV",
+            "Name" : {
+              "Key" : "BSV_IVTAVRSC",
+              "" : "Is the validation time in the validity range of the signing certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67-CV",
+            "Name" : {
+              "Key" : "BSV_ICVRC",
+              "" : "Is the result of the 'Cryptographic Verification' building block conclusive?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "BSV_ICVRC_ANS",
+              "" : "The result of the 'Cryptographic Verification' building block is not conclusive!"
+            }
+          } ],
+          "Conclusion" : {
+            "Indication" : "FAILED",
+            "SubIndication" : "HASH_FAILURE",
+            "Errors" : [ {
+              "Key" : "BBB_XCV_SUB_ANS",
+              "" : "The certificate validation is not conclusive!"
+            }, {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }, {
+              "Key" : "BBB_CV_TSP_IRDOI_ANS",
+              "" : "The time-stamp message imprint is not intact!"
+            } ]
+          }
+        },
+        "ValidationProcessArchivalDataTimestamp" : {
+          "Title" : "Validation Process for Time-stamps with Archival Data",
+          "Constraint" : {
+            "BlockType" : "TST_BBB",
+            "Name" : {
+              "Key" : "ARCH_IRTVBBA",
+              "" : "Is the result of the Time-stamp Validation Building Block acceptable?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "ARCH_IRTVBBA_ANS",
+              "" : "The result of the Time-stamp Validation Building Block is not acceptable to continue the process!"
+            }
+          },
+          "Conclusion" : {
+            "Indication" : "FAILED",
+            "SubIndication" : "HASH_FAILURE",
+            "Errors" : [ {
+              "Key" : "BBB_XCV_SUB_ANS",
+              "" : "The certificate validation is not conclusive!"
+            }, {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }, {
+              "Key" : "BBB_CV_TSP_IRDOI_ANS",
+              "" : "The time-stamp message imprint is not intact!"
+            } ]
+          },
+          "ProofOfExistence" : {
+            "Time" : "2026-05-27T19:43:06Z"
+          }
+        },
+        "ValidationTimestampQualification" : {
+          "TimestampQualification" : "N/A",
+          "Title" : "Time-stamp Qualification",
+          "Constraint" : {
+            "Name" : {
+              "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED",
+              "" : "Has a trusted list been reached for the certificate chain?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+              "" : "Unable to build a certificate chain up to a trusted list!"
+            }
+          },
+          "Conclusion" : {
+            "Indication" : "FAILED",
+            "Errors" : {
+              "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+              "" : "Unable to build a certificate chain up to a trusted list!"
+            }
+          }
+        },
+        "Conclusion" : {
+          "Indication" : "FAILED",
+          "SubIndication" : "HASH_FAILURE",
+          "Errors" : [ {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          }, {
+            "Key" : "BBB_CV_TSP_IRDOI_ANS",
+            "" : "The time-stamp message imprint is not intact!"
+          } ]
+        }
+      } ],
+      "ValidationProcessLongTermData" : {
+        "Title" : "Validation Process for Signatures with Time and Signatures with Long-Term Validation Data",
+        "Constraint" : {
+          "Name" : {
+            "Key" : "LTV_ABSV",
+            "" : "Is the result of the Basic Validation Process acceptable?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "LTV_ABSV_ANS",
+            "" : "The result of the Basic validation process is not acceptable to continue the process!"
+          }
+        },
+        "Conclusion" : {
+          "Indication" : "FAILED",
+          "SubIndication" : "FORMAT_FAILURE",
+          "Errors" : [ {
+            "Key" : "BBB_FC_IBRV_ANS",
+            "" : "The /ByteRange dictionary is not consistent!"
+          }, {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          }, {
+            "Key" : "BBB_CV_IRDOI_ANS",
+            "" : "The reference data object is not intact!"
+          } ],
+          "Warnings" : {
+            "Key" : "BBB_XCV_AIA_PRES_ANS",
+            "" : "The authority info access is not present!"
+          }
+        },
+        "ProofOfExistence" : {
+          "Time" : "2026-05-27T19:43:06Z"
+        }
+      },
+      "ValidationProcessArchivalData" : {
+        "Title" : "Validation Process for Signatures with Archival Data",
+        "Constraint" : {
+          "BlockType" : "LTV",
+          "Name" : {
+            "Key" : "ARCH_LTVV",
+            "" : "Is the result of the LTV validation process acceptable?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "ARCH_LTVV_ANS",
+            "" : "The result of the LTV validation process is not acceptable to continue the process!"
+          }
+        },
+        "Conclusion" : {
+          "Indication" : "FAILED",
+          "SubIndication" : "FORMAT_FAILURE",
+          "Errors" : [ {
+            "Key" : "BBB_FC_IBRV_ANS",
+            "" : "The /ByteRange dictionary is not consistent!"
+          }, {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          }, {
+            "Key" : "BBB_CV_IRDOI_ANS",
+            "" : "The reference data object is not intact!"
+          } ],
+          "Warnings" : {
+            "Key" : "BBB_XCV_AIA_PRES_ANS",
+            "" : "The authority info access is not present!"
+          }
+        },
+        "ProofOfExistence" : {
+          "Time" : "2026-05-27T19:43:06Z"
+        }
+      },
+      "ValidationSignatureQualification" : {
+        "SignatureQualification" : "N/A",
+        "Title" : "Signature Qualification",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "QUAL_IS_ADES",
+            "" : "Is the signature/seal an acceptable AdES digital signature (ETSI EN 319 102-1)?"
+          },
+          "Status" : "WARNING",
+          "Warning" : {
+            "Key" : "QUAL_IS_ADES_INV",
+            "" : "The signature/seal is not a valid AdES digital signature!"
+          }
+        }, {
+          "Name" : {
+            "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED",
+            "" : "Has a trusted list been reached for the certificate chain?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+            "" : "Unable to build a certificate chain up to a trusted list!"
+          }
+        } ],
+        "Conclusion" : {
+          "Indication" : "FAILED",
+          "Errors" : {
+            "Key" : "QUAL_CERT_TRUSTED_LIST_REACHED_ANS",
+            "" : "Unable to build a certificate chain up to a trusted list!"
+          },
+          "Warnings" : {
+            "Key" : "QUAL_IS_ADES_INV",
+            "" : "The signature/seal is not a valid AdES digital signature!"
+          }
+        }
+      },
+      "Conclusion" : {
+        "Indication" : "TOTAL_FAILED",
+        "SubIndication" : "FORMAT_FAILURE"
+      }
+    },
+    "BasicBuildingBlocks" : [ {
+      "Id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70",
+      "Type" : "TIMESTAMP",
+      "ISC" : {
+        "Title" : "Identification of the Signing Certificate",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_ICS_ISCI",
+            "" : "Is there an identified candidate for the signing certificate?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_ISACDP",
+            "" : "Is the signed attribute: 'cert-digest' of the certificate present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_AIDNASNE",
+            "" : "Are the issuer distinguished name and the serial number equal?"
+          },
+          "Status" : "OK"
+        } ],
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        },
+        "CertificateChain" : {
+          "ChainItem" : [ {
+            "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+            "Source" : "TIMESTAMP"
+          }, {
+            "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+            "Source" : "TRUSTED_STORE"
+          } ]
+        }
+      },
+      "XCV" : {
+        "Title" : "X509 Certificate Validation",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_XCV_CCCBB",
+            "" : "Can the certificate chain be built till a trust anchor?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_XCV_HPCCVVT",
+            "" : "Has a prospective certificate chain valid at validation time been found?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Validation time : 2026-05-27 19:43"
+        }, {
+          "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+          "BlockType" : "SUB_XCV",
+          "Name" : {
+            "Key" : "BBB_XCV_SUB",
+            "" : "Is the certificate validation conclusive?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }
+        } ],
+        "Conclusion" : {
+          "Indication" : "INDETERMINATE",
+          "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+          "Errors" : [ {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          } ]
+        },
+        "SubXCV" : [ {
+          "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+          "TrustAnchor" : "false",
+          "SelfSigned" : "false",
+          "Title" : "Certificate",
+          "Constraint" : [ {
+            "Name" : {
+              "Key" : "BBB_XCV_ISNSSC",
+              "" : "Is certificate not self-signed?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICSI",
+              "" : "Is the certificate signature intact?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCIDNMSDNIC",
+              "" : "Does the certificate's issuer DN match the subject DN of the issuer certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ISCGEKU",
+              "" : "Does the certificate have an expected 'extended key-usage(s)'?"
+            },
+            "Status" : "OK",
+            "AdditionalInfo" : "Extended key usage : [timeStamping]"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICPTV",
+              "" : "Is the certificate's policy tree valid?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCSBSINC",
+              "" : "Do certificate's subject names satisfy the imposed name constraints?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCCUCE",
+              "" : "Are all found critical certificate extensions supported?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCCFCE",
+              "" : "Are all found certificate extensions allowed for the certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "BlockType" : "LTV_SUB_XCV",
+            "Name" : {
+              "Key" : "BBB_XCV_IRDPFC",
+              "" : "Is the revocation data present for the certificate?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }
+          } ],
+          "Conclusion" : {
+            "Indication" : "INDETERMINATE",
+            "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+            "Errors" : {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }
+          }
+        }, {
+          "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+          "TrustAnchor" : "true",
+          "SelfSigned" : "true",
+          "Title" : "Certificate",
+          "Conclusion" : {
+            "Indication" : "PASSED"
+          }
+        } ]
+      },
+      "CV" : {
+        "Title" : "Cryptographic Verification",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_CV_TSP_IRDOF",
+            "" : "Has the message imprint data been found?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_CV_TSP_IRDOI",
+            "" : "Is the message imprint data intact?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_CV_ISIT",
+            "" : "Is time-stamp's signature intact?"
+          },
+          "Status" : "OK"
+        } ],
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        }
+      },
+      "SAV" : {
+        "Title" : "Signature Acceptance Validation",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_ICS_ISASCP",
+            "" : "Is the signed attribute: 'signing-certificate' present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_SAV_DSCACRCC",
+            "" : "Does the 'Signing Certificate' attribute contain references only to the certificate chain?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_TAV_DTSAVM",
+            "" : "Does the TST Info field: 'tsa' match the time-stamp's issuer name?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "ACCM",
+            "" : "Are cryptographic constraints met for the time-stamp signature?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Signature algorithm RSA with SHA256 with key size 2048 at validation time : 2026-05-27 19:43"
+        }, {
+          "Name" : {
+            "Key" : "ACCM",
+            "" : "Are cryptographic constraints met for the time-stamp message imprint?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Digest algorithm SHA256 at validation time : 2026-05-27 19:43 for time-stamp message imprint"
+        } ],
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        },
+        "CryptographicValidation" : {
+          "secure" : "false",
+          "Algorithm" : {
+            "Name" : "SHA1",
+            "Uri" : "http://www.w3.org/2000/09/xmldsig#sha1"
+          },
+          "NotAfter" : "2012-07-31T21:00:00Z",
+          "ValidationTime" : "2026-05-27T19:43:06Z",
+          "ConcernedMaterial" : "signing-certificate reference with Id : C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+        }
+      },
+      "CertificateChain" : {
+        "ChainItem" : [ {
+          "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+          "Source" : "TIMESTAMP"
+        }, {
+          "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+          "Source" : "TRUSTED_STORE"
+        } ]
+      },
+      "Conclusion" : {
+        "Indication" : "INDETERMINATE",
+        "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+        "Errors" : [ {
+          "Key" : "BBB_XCV_SUB_ANS",
+          "" : "The certificate validation is not conclusive!"
+        }, {
+          "Key" : "BBB_XCV_IRDPFC_ANS",
+          "" : "No revocation data found for the certificate!"
+        } ]
+      }
+    }, {
+      "Id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67",
+      "Type" : "TIMESTAMP",
+      "FC" : {
+        "Title" : "Format Checking",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_FC_IBRV",
+            "" : "Is the /ByteRange dictionary consistent?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_DBTOOST",
+            "" : "Does the /ByteRange not overlap with other signature/timestamp?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_ISDC",
+            "" : "Is the signature dictionary consistent?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_DSFREAP",
+            "" : "Do signed and final revisions contain equal amount of pages?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_IAOD",
+            "" : "Is no element overlapping detected in the PDF?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_IVDBSFR",
+            "" : "Is there no visual difference between signed and final revisions in the PDF?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_DSCNUOM",
+            "" : "Does the document contain none of the undefined object modifications?"
+          },
+          "Status" : "OK"
+        } ],
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        }
+      },
+      "ISC" : {
+        "Title" : "Identification of the Signing Certificate",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_ICS_ISCI",
+            "" : "Is there an identified candidate for the signing certificate?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_ISACDP",
+            "" : "Is the signed attribute: 'cert-digest' of the certificate present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_AIDNASNE",
+            "" : "Are the issuer distinguished name and the serial number equal?"
+          },
+          "Status" : "OK"
+        } ],
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        },
+        "CertificateChain" : {
+          "ChainItem" : [ {
+            "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+            "Source" : "TIMESTAMP"
+          }, {
+            "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+            "Source" : "TRUSTED_STORE"
+          } ]
+        }
+      },
+      "XCV" : {
+        "Title" : "X509 Certificate Validation",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_XCV_CCCBB",
+            "" : "Can the certificate chain be built till a trust anchor?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_XCV_HPCCVVT",
+            "" : "Has a prospective certificate chain valid at validation time been found?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Validation time : 2026-05-27 19:43"
+        }, {
+          "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+          "BlockType" : "SUB_XCV",
+          "Name" : {
+            "Key" : "BBB_XCV_SUB",
+            "" : "Is the certificate validation conclusive?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }
+        } ],
+        "Conclusion" : {
+          "Indication" : "INDETERMINATE",
+          "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+          "Errors" : [ {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          } ]
+        },
+        "SubXCV" : [ {
+          "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+          "TrustAnchor" : "false",
+          "SelfSigned" : "false",
+          "Title" : "Certificate",
+          "Constraint" : [ {
+            "Name" : {
+              "Key" : "BBB_XCV_ISNSSC",
+              "" : "Is certificate not self-signed?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICSI",
+              "" : "Is the certificate signature intact?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCIDNMSDNIC",
+              "" : "Does the certificate's issuer DN match the subject DN of the issuer certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ISCGEKU",
+              "" : "Does the certificate have an expected 'extended key-usage(s)'?"
+            },
+            "Status" : "OK",
+            "AdditionalInfo" : "Extended key usage : [timeStamping]"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICPTV",
+              "" : "Is the certificate's policy tree valid?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCSBSINC",
+              "" : "Do certificate's subject names satisfy the imposed name constraints?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCCUCE",
+              "" : "Are all found critical certificate extensions supported?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCCFCE",
+              "" : "Are all found certificate extensions allowed for the certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "BlockType" : "LTV_SUB_XCV",
+            "Name" : {
+              "Key" : "BBB_XCV_IRDPFC",
+              "" : "Is the revocation data present for the certificate?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }
+          } ],
+          "Conclusion" : {
+            "Indication" : "INDETERMINATE",
+            "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+            "Errors" : {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }
+          }
+        }, {
+          "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+          "TrustAnchor" : "true",
+          "SelfSigned" : "true",
+          "Title" : "Certificate",
+          "Conclusion" : {
+            "Indication" : "PASSED"
+          }
+        } ]
+      },
+      "CV" : {
+        "Title" : "Cryptographic Verification",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_CV_TSP_IRDOF",
+            "" : "Has the message imprint data been found?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_CV_TSP_IRDOI",
+            "" : "Is the message imprint data intact?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "BBB_CV_TSP_IRDOI_ANS",
+            "" : "The time-stamp message imprint is not intact!"
+          }
+        } ],
+        "Conclusion" : {
+          "Indication" : "FAILED",
+          "SubIndication" : "HASH_FAILURE",
+          "Errors" : {
+            "Key" : "BBB_CV_TSP_IRDOI_ANS",
+            "" : "The time-stamp message imprint is not intact!"
+          }
+        }
+      },
+      "SAV" : {
+        "Title" : "Signature Acceptance Validation",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_ICS_ISASCP",
+            "" : "Is the signed attribute: 'signing-certificate' present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_SAV_DSCACRCC",
+            "" : "Does the 'Signing Certificate' attribute contain references only to the certificate chain?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_TAV_DTSAVM",
+            "" : "Does the TST Info field: 'tsa' match the time-stamp's issuer name?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "ACCM",
+            "" : "Are cryptographic constraints met for the time-stamp signature?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Signature algorithm RSA with SHA256 with key size 2048 at validation time : 2026-05-27 19:43"
+        }, {
+          "Name" : {
+            "Key" : "ACCM",
+            "" : "Are cryptographic constraints met for the time-stamp message imprint?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Digest algorithm SHA256 at validation time : 2026-05-27 19:43 for time-stamp message imprint"
+        } ],
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        },
+        "CryptographicValidation" : {
+          "secure" : "false",
+          "Algorithm" : {
+            "Name" : "SHA1",
+            "Uri" : "http://www.w3.org/2000/09/xmldsig#sha1"
+          },
+          "NotAfter" : "2012-07-31T21:00:00Z",
+          "ValidationTime" : "2026-05-27T19:43:06Z",
+          "ConcernedMaterial" : "signing-certificate reference with Id : C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+        }
+      },
+      "CertificateChain" : {
+        "ChainItem" : [ {
+          "Id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+          "Source" : "TIMESTAMP"
+        }, {
+          "Id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+          "Source" : "TRUSTED_STORE"
+        } ]
+      },
+      "Conclusion" : {
+        "Indication" : "FAILED",
+        "SubIndication" : "HASH_FAILURE",
+        "Errors" : [ {
+          "Key" : "BBB_XCV_SUB_ANS",
+          "" : "The certificate validation is not conclusive!"
+        }, {
+          "Key" : "BBB_XCV_IRDPFC_ANS",
+          "" : "No revocation data found for the certificate!"
+        }, {
+          "Key" : "BBB_CV_TSP_IRDOI_ANS",
+          "" : "The time-stamp message imprint is not intact!"
+        } ]
+      }
+    }, {
+      "Id" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147",
+      "Type" : "SIGNATURE",
+      "FC" : {
+        "Title" : "Format Checking",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_FC_IEFF",
+            "" : "Does the signature format correspond to an expected format?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_ISD",
+            "" : "Is the signature identification not ambiguous?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_ISRIA",
+            "" : "Is the signed references identification not ambiguous?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_IOSIP",
+            "" : "Is only one SignerInfo present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_FC_IBRV",
+            "" : "Is the /ByteRange dictionary consistent?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "BBB_FC_IBRV_ANS",
+            "" : "The /ByteRange dictionary is not consistent!"
+          }
+        } ],
+        "Conclusion" : {
+          "Indication" : "FAILED",
+          "SubIndication" : "FORMAT_FAILURE",
+          "Errors" : {
+            "Key" : "BBB_FC_IBRV_ANS",
+            "" : "The /ByteRange dictionary is not consistent!"
+          }
+        }
+      },
+      "ISC" : {
+        "Title" : "Identification of the Signing Certificate",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_ICS_ISCI",
+            "" : "Is there an identified candidate for the signing certificate?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_ISACDP",
+            "" : "Is the signed attribute: 'cert-digest' of the certificate present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_ICDVV",
+            "" : "Does the certificate digest value match a digest value found in the certificate reference(s)?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_AIDNASNE",
+            "" : "Are the issuer distinguished name and the serial number equal?"
+          },
+          "Status" : "OK"
+        } ],
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        },
+        "CertificateChain" : {
+          "ChainItem" : [ {
+            "Id" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+            "Source" : "SIGNATURE"
+          }, {
+            "Id" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F",
+            "Source" : "SIGNATURE"
+          }, {
+            "Id" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193",
+            "Source" : "TRUSTED_STORE"
+          } ]
+        }
+      },
+      "VCI" : {
+        "Title" : "Validation Context Initialization",
+        "Constraint" : {
+          "Name" : {
+            "Key" : "BBB_VCI_ISPK",
+            "" : "Is the signature policy known?"
+          },
+          "Status" : "OK"
+        },
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        }
+      },
+      "XCV" : {
+        "Title" : "X509 Certificate Validation",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_XCV_CCCBB",
+            "" : "Can the certificate chain be built till a trust anchor?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_XCV_HPCCVVT",
+            "" : "Has a prospective certificate chain valid at validation time been found?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Validation time : 2026-05-27 19:43"
+        }, {
+          "Id" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+          "BlockType" : "SUB_XCV",
+          "Name" : {
+            "Key" : "BBB_XCV_SUB",
+            "" : "Is the certificate validation conclusive?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }
+        } ],
+        "Conclusion" : {
+          "Indication" : "INDETERMINATE",
+          "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+          "Errors" : [ {
+            "Key" : "BBB_XCV_SUB_ANS",
+            "" : "The certificate validation is not conclusive!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          }, {
+            "Key" : "BBB_XCV_IRDPFC_ANS",
+            "" : "No revocation data found for the certificate!"
+          } ],
+          "Warnings" : {
+            "Key" : "BBB_XCV_AIA_PRES_ANS",
+            "" : "The authority info access is not present!"
+          }
+        },
+        "SubXCV" : [ {
+          "Id" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+          "TrustAnchor" : "false",
+          "SelfSigned" : "false",
+          "Title" : "Certificate",
+          "Constraint" : [ {
+            "Name" : {
+              "Key" : "QUAL_UNIQUE_CERT",
+              "" : "Is the certificate unique?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_PSEUDO_USE",
+              "" : "Is a pseudonym used?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ISNSSC",
+              "" : "Is certificate not self-signed?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICSI",
+              "" : "Is the certificate signature intact?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCIDNMSDNIC",
+              "" : "Does the certificate's issuer DN match the subject DN of the issuer certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ISCGKU",
+              "" : "Does the certificate have an expected key-usage?"
+            },
+            "Status" : "OK",
+            "AdditionalInfo" : "Key usage : [DIGITAL_SIGNATURE, NON_REPUDIATION]"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_AIA_PRES",
+              "" : "Is the authority info access present?"
+            },
+            "Status" : "WARNING",
+            "Warning" : {
+              "Key" : "BBB_XCV_AIA_PRES_ANS",
+              "" : "The authority info access is not present!"
+            }
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICPTV",
+              "" : "Is the certificate's policy tree valid?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCSBSINC",
+              "" : "Do certificate's subject names satisfy the imposed name constraints?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCCUCE",
+              "" : "Are all found critical certificate extensions supported?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCCFCE",
+              "" : "Are all found certificate extensions allowed for the certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_REVOC_PRES",
+              "" : "Is the revocation info access present?"
+            },
+            "Status" : "OK"
+          }, {
+            "BlockType" : "LTV_SUB_XCV",
+            "Name" : {
+              "Key" : "BBB_XCV_IRDPFC",
+              "" : "Is the revocation data present for the certificate?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }
+          } ],
+          "Conclusion" : {
+            "Indication" : "INDETERMINATE",
+            "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+            "Errors" : {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            },
+            "Warnings" : {
+              "Key" : "BBB_XCV_AIA_PRES_ANS",
+              "" : "The authority info access is not present!"
+            }
+          }
+        }, {
+          "Id" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F",
+          "TrustAnchor" : "false",
+          "SelfSigned" : "false",
+          "Title" : "Certificate",
+          "Constraint" : [ {
+            "Name" : {
+              "Key" : "BBB_XCV_ICSI",
+              "" : "Is the certificate signature intact?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICAC",
+              "" : "Is the certificate a CA certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCIDNMSDNIC",
+              "" : "Does the certificate's issuer DN match the subject DN of the issuer certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICPDV",
+              "" : "Is the certificate's path depth valid?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ISCGKU",
+              "" : "Does the certificate have an expected key-usage?"
+            },
+            "Status" : "OK",
+            "AdditionalInfo" : "Key usage : [KEY_CERT_SIGN, CRL_SIGN]"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_ICPTV",
+              "" : "Is the certificate's policy tree valid?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCSBSINC",
+              "" : "Do certificate's subject names satisfy the imposed name constraints?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCCUCE",
+              "" : "Are all found critical certificate extensions supported?"
+            },
+            "Status" : "OK"
+          }, {
+            "Name" : {
+              "Key" : "BBB_XCV_DCCFCE",
+              "" : "Are all found certificate extensions allowed for the certificate?"
+            },
+            "Status" : "OK"
+          }, {
+            "BlockType" : "LTV_SUB_XCV",
+            "Name" : {
+              "Key" : "BBB_XCV_IRDPFC",
+              "" : "Is the revocation data present for the certificate?"
+            },
+            "Status" : "NOT OK",
+            "Error" : {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }
+          } ],
+          "Conclusion" : {
+            "Indication" : "INDETERMINATE",
+            "SubIndication" : "CERTIFICATE_CHAIN_GENERAL_FAILURE",
+            "Errors" : {
+              "Key" : "BBB_XCV_IRDPFC_ANS",
+              "" : "No revocation data found for the certificate!"
+            }
+          }
+        }, {
+          "Id" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193",
+          "TrustAnchor" : "true",
+          "SelfSigned" : "true",
+          "Title" : "Certificate",
+          "Conclusion" : {
+            "Indication" : "PASSED"
+          }
+        } ]
+      },
+      "CV" : {
+        "Title" : "Cryptographic Verification",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_CV_IRDOF",
+            "" : "Has the reference data object been found?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Reference : MESSAGE_DIGEST"
+        }, {
+          "Name" : {
+            "Key" : "BBB_CV_IRDOI",
+            "" : "Is the reference data object intact?"
+          },
+          "Status" : "NOT OK",
+          "Error" : {
+            "Key" : "BBB_CV_IRDOI_ANS",
+            "" : "The reference data object is not intact!"
+          },
+          "AdditionalInfo" : "Reference : MESSAGE_DIGEST"
+        } ],
+        "Conclusion" : {
+          "Indication" : "FAILED",
+          "SubIndication" : "HASH_FAILURE",
+          "Errors" : {
+            "Key" : "BBB_CV_IRDOI_ANS",
+            "" : "The reference data object is not intact!"
+          }
+        }
+      },
+      "SAV" : {
+        "Title" : "Signature Acceptance Validation",
+        "Constraint" : [ {
+          "Name" : {
+            "Key" : "BBB_SAV_ISSV",
+            "" : "Is the structure of the signature valid?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_ISASCP",
+            "" : "Is the signed attribute: 'signing-certificate' present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_ICS_ISASCPU",
+            "" : "Is the signed attribute: 'signing-certificate' present only once?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_SAV_DSCACRCC",
+            "" : "Does the 'Signing Certificate' attribute contain references only to the certificate chain?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_SAV_ISQPSTP",
+            "" : "Is the signed qualifying property: 'signing-time' present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "BBB_SAV_ISQPMDOSPP",
+            "" : "Is the signed qualifying property: 'message-digest' or 'SignedProperties' present?"
+          },
+          "Status" : "OK"
+        }, {
+          "Name" : {
+            "Key" : "ACCM",
+            "" : "Are cryptographic constraints met for the signature creation?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Signature algorithm RSA with SHA256 with key size 2048 at validation time : 2026-05-27 19:43"
+        }, {
+          "Name" : {
+            "Key" : "ACCM",
+            "" : "Are cryptographic constraints met for the message digest?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Digest algorithm SHA256 at validation time : 2026-05-27 19:43 for message digest"
+        }, {
+          "Name" : {
+            "Key" : "ACCM",
+            "" : "Are cryptographic constraints met for the signing-certificate reference?"
+          },
+          "Status" : "OK",
+          "AdditionalInfo" : "Digest algorithm SHA256 at validation time : 2026-05-27 19:43 for signing-certificate reference with Id : C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B"
+        } ],
+        "Conclusion" : {
+          "Indication" : "PASSED"
+        },
+        "CryptographicValidation" : {
+          "secure" : "true",
+          "Algorithm" : {
+            "Name" : "RSA with SHA256",
+            "Uri" : "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+            "KeyLength" : "2048"
+          },
+          "NotAfter" : "2028-12-31T22:00:00Z",
+          "ValidationTime" : "2026-05-27T19:43:06Z",
+          "ConcernedMaterial" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147"
+        }
+      },
+      "CertificateChain" : {
+        "ChainItem" : [ {
+          "Id" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+          "Source" : "SIGNATURE"
+        }, {
+          "Id" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F",
+          "Source" : "SIGNATURE"
+        }, {
+          "Id" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193",
+          "Source" : "TRUSTED_STORE"
+        } ]
+      },
+      "Conclusion" : {
+        "Indication" : "FAILED",
+        "SubIndication" : "HASH_FAILURE",
+        "Errors" : [ {
+          "Key" : "BBB_FC_IBRV_ANS",
+          "" : "The /ByteRange dictionary is not consistent!"
+        }, {
+          "Key" : "BBB_XCV_SUB_ANS",
+          "" : "The certificate validation is not conclusive!"
+        }, {
+          "Key" : "BBB_XCV_IRDPFC_ANS",
+          "" : "No revocation data found for the certificate!"
+        }, {
+          "Key" : "BBB_XCV_IRDPFC_ANS",
+          "" : "No revocation data found for the certificate!"
+        }, {
+          "Key" : "BBB_CV_IRDOI_ANS",
+          "" : "The reference data object is not intact!"
+        } ],
+        "Warnings" : {
+          "Key" : "BBB_XCV_AIA_PRES_ANS",
+          "" : "The authority info access is not present!"
+        }
+      }
+    } ]
+  },
+  "etsiValidationReport" : {
+    "SignatureValidationReport" : {
+      "SignatureIdentifier" : {
+        "id" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147",
+        "DigestAlgAndValue" : {
+          "DigestMethod" : {
+            "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+          },
+          "DigestValue" : "P4H4wGg4+34gix44Y8dJ1AnEG8WhgmsdbVjLGxjP/lY="
+        },
+        "SignatureValue" : "oj2uAv48NVHtX04zNlebmLZ/ul/Yb+zV1O/BPjGgTTdYWJXK2QtgeFWpeg+Mkvz1Nrfom5Twr9clY+AC6FV3MSSEU9w06fhn+6raY9v9zYKf26ryHwCRE9oBomKvX0OuLiASGwbiXAWkXtyKkEjQfJWHYHg0FdWiRR6mqEy94Zoi3T7kLeMK9igIFLbODc7Coe8cxcdaNDQggyyyNxkd4pAD1+dWNPPpFYsqXQiyo9BqTq+53/AUK405ofJjn6I26VGuBdXqKwQ/H5gQMP+abSCESKIb6UE1vUJlA/C/D9Yw4KoyRjNq2htlzTDHcIP8nq5WdZXhcJ2tIAT4vAimvw==",
+        "HashOnly" : "false",
+        "DocHashOnly" : "false"
+      },
+      "ValidationConstraintsEvaluationReport" : {
+        "ValidationConstraint" : [ {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:formatChecking",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:applied"
+          },
+          "ValidationStatus" : {
+            "MainIndication" : "urn:etsi:019102:mainindication:failed",
+            "SubIndication" : "urn:etsi:019102:subindication:FORMAT_FAILURE",
+            "AssociatedValidationReportData" : {
+              "AdditionalValidationReportData" : {
+                "ReportData" : {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "The /ByteRange dictionary is not consistent!"
+                  }
+                }
+              }
+            }
+          }
+        }, {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:identificationOfTheSigningCertificate",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:applied"
+          },
+          "ValidationStatus" : {
+            "MainIndication" : "urn:etsi:019102:mainindication:passed"
+          }
+        }, {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:validationContextInitialization",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:applied"
+          },
+          "ValidationStatus" : {
+            "MainIndication" : "urn:etsi:019102:mainindication:passed"
+          }
+        }, {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:cryptographicVerification",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:applied"
+          },
+          "ValidationStatus" : {
+            "MainIndication" : "urn:etsi:019102:mainindication:failed",
+            "SubIndication" : "urn:etsi:019102:subindication:HASH_FAILURE",
+            "AssociatedValidationReportData" : {
+              "AdditionalValidationReportData" : {
+                "ReportData" : {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "The reference data object is not intact!"
+                  }
+                }
+              }
+            }
+          }
+        }, {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:signatureAcceptanceValidation",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:applied"
+          },
+          "ValidationStatus" : {
+            "MainIndication" : "urn:etsi:019102:mainindication:passed"
+          }
+        }, {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:x509CertificateValidation",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:applied"
+          },
+          "ValidationStatus" : {
+            "MainIndication" : "urn:etsi:019102:mainindication:indeterminate",
+            "SubIndication" : "urn:etsi:019102:subindication:CERTIFICATE_CHAIN_GENERAL_FAILURE",
+            "AssociatedValidationReportData" : {
+              "AdditionalValidationReportData" : {
+                "ReportData" : [ {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "The certificate validation is not conclusive!"
+                  }
+                }, {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "No revocation data found for the certificate!"
+                  }
+                }, {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "No revocation data found for the certificate!"
+                  }
+                }, {
+                  "Type" : "urn:cef:dss:message:warning",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "The authority info access is not present!"
+                  }
+                } ]
+              }
+            }
+          }
+        }, {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:pastSignatureValidation",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:disabled"
+          }
+        }, {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:pastCertificateValidation",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:disabled"
+          }
+        }, {
+          "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:validationTimeSliding",
+          "ConstraintStatus" : {
+            "Status" : "urn:etsi:019102:constraintStatus:disabled"
+          }
+        } ]
+      },
+      "ValidationTimeInfo" : {
+        "ValidationTime" : "2026-05-27T19:43:06Z",
+        "BestSignatureTime" : {
+          "POETime" : "2026-05-27T19:43:06Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation"
+        }
+      },
+      "SignersDocument" : {
+        "DigestAlgAndValue" : {
+          "DigestMethod" : {
+            "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+          },
+          "DigestValue" : "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        },
+        "SignersDocumentRepresentation" : {
+          "VOReference" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568"
+        }
+      },
+      "SignatureAttributes" : {
+        "SigningTime" : {
+          "Time" : "2026-05-23T16:04:56Z"
+        },
+        "SigningCertificate" : {
+          "AttributeObject" : {
+            "VOReference" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B"
+          }
+        },
+        "DataObjectFormat" : {
+          "ContentType" : "1.2.840.113549.1.7.1"
+        },
+        "SignatureTimeStamp" : {
+          "AttributeObject" : {
+            "VOReference" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+          },
+          "TimeStampValue" : "2026-05-23T16:04:56Z"
+        },
+        "MessageDigest" : {
+          "Digest" : "RmUporfK1sLk7oEr+7K3FfqtrjTo1p03Pa2/4iF3gJQ="
+        },
+        "DocTimeStamp" : {
+          "AttributeObject" : {
+            "VOReference" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67"
+          },
+          "TimeStampValue" : "2026-05-23T16:04:56Z"
+        },
+        "SubFilter" : {
+          "SubFilterElement" : "ETSI.CAdES.detached"
+        },
+        "ByteRange" : "-1 418 19470 512",
+        "Filter" : {
+          "Filter" : "Adobe.PPKLite"
+        }
+      },
+      "SignerInformation" : {
+        "Pseudonym" : "false",
+        "SignerCertificate" : {
+          "VOReference" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B"
+        },
+        "Signer" : "pdfgen Signer"
+      },
+      "SignatureQuality" : {
+        "SignatureQualityInformation" : "urn:cef:dss:signatureQualification:notApplicable"
+      },
+      "SignatureValidationProcess" : {
+        "SignatureValidationProcessID" : "urn:etsi:019102:validationprocess:LTA"
+      },
+      "SignatureValidationStatus" : {
+        "MainIndication" : "urn:etsi:019102:mainindication:total-failed",
+        "SubIndication" : "urn:etsi:019102:subindication:FORMAT_FAILURE",
+        "AssociatedValidationReportData" : {
+          "TrustAnchor" : {
+            "VOReference" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193"
+          },
+          "CertificateChain" : {
+            "SigningCertificate" : {
+              "VOReference" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B"
+            },
+            "IntermediateCertificate" : {
+              "VOReference" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F"
+            },
+            "TrustAnchor" : {
+              "VOReference" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193"
+            }
+          },
+          "CryptoInformation" : {
+            "ValidationObjectId" : {
+              "VOReference" : "S-7187A42ACA0D488E777F81624FA6E7548DF198975F7A47C31ED82D2692534147"
+            },
+            "Algorithm" : "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+            "SecureAlgorithm" : "true",
+            "NotAfter" : "2028-12-31T22:00:00Z"
+          },
+          "AdditionalValidationReportData" : {
+            "ReportData" : [ {
+              "Type" : "urn:cef:dss:message:error",
+              "Value" : {
+                "type" : "xs:string",
+                "" : "The /ByteRange dictionary is not consistent!"
+              }
+            }, {
+              "Type" : "urn:cef:dss:message:error",
+              "Value" : {
+                "type" : "xs:string",
+                "" : "The certificate validation is not conclusive!"
+              }
+            }, {
+              "Type" : "urn:cef:dss:message:error",
+              "Value" : {
+                "type" : "xs:string",
+                "" : "No revocation data found for the certificate!"
+              }
+            }, {
+              "Type" : "urn:cef:dss:message:error",
+              "Value" : {
+                "type" : "xs:string",
+                "" : "The reference data object is not intact!"
+              }
+            }, {
+              "Type" : "urn:cef:dss:message:warning",
+              "Value" : {
+                "type" : "xs:string",
+                "" : "The authority info access is not present!"
+              }
+            } ]
+          }
+        }
+      }
+    },
+    "SignatureValidationObjects" : {
+      "ValidationObject" : [ {
+        "id" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70",
+        "ObjectType" : "urn:etsi:019102:validationObject:timestamp",
+        "ValidationObjectRepresentation" : {
+          "DigestAlgAndValue" : {
+            "DigestMethod" : {
+              "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+            },
+            "DigestValue" : "QWPoeSCb9QrzK1g0qAxqveCJi4DjKa+0X4yaIeIwzWM="
+          }
+        },
+        "POE" : {
+          "POETime" : "2026-05-27T19:43:06Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation"
+        },
+        "POEProvisioning" : {
+          "POETime" : "2026-05-23T16:04:56Z",
+          "ValidationObject" : [ {
+            "VOReference" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B"
+          }, {
+            "VOReference" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568"
+          } ],
+          "SignatureReference" : {
+            "DigestMethod" : "http://www.w3.org/2001/04/xmlenc#sha256",
+            "DigestValue" : "OwgsIq9v1t6uIKLdZrx1CnuVekazhCdenVuqbdjeoDU="
+          }
+        },
+        "ValidationReport" : {
+          "ValidationConstraintsEvaluationReport" : {
+            "ValidationConstraint" : [ {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:formatChecking",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:identificationOfTheSigningCertificate",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:passed"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:validationContextInitialization",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:cryptographicVerification",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:passed"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:signatureAcceptanceValidation",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:passed"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:x509CertificateValidation",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:indeterminate",
+                "SubIndication" : "urn:etsi:019102:subindication:CERTIFICATE_CHAIN_GENERAL_FAILURE",
+                "AssociatedValidationReportData" : {
+                  "AdditionalValidationReportData" : {
+                    "ReportData" : [ {
+                      "Type" : "urn:cef:dss:message:error",
+                      "Value" : {
+                        "type" : "xs:string",
+                        "" : "The certificate validation is not conclusive!"
+                      }
+                    }, {
+                      "Type" : "urn:cef:dss:message:error",
+                      "Value" : {
+                        "type" : "xs:string",
+                        "" : "No revocation data found for the certificate!"
+                      }
+                    } ]
+                  }
+                }
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:pastSignatureValidation",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:pastCertificateValidation",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:validationTimeSliding",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            } ]
+          },
+          "SignerInformation" : {
+            "SignerCertificate" : {
+              "VOReference" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+            },
+            "Signer" : "pdfgen TSA good"
+          },
+          "SignatureQuality" : {
+            "SignatureQualityInformation" : "urn:cef:dss:timestampQualification:notApplicable"
+          },
+          "SignatureValidationStatus" : {
+            "MainIndication" : "urn:etsi:019102:mainindication:indeterminate",
+            "SubIndication" : "urn:etsi:019102:subindication:CERTIFICATE_CHAIN_GENERAL_FAILURE",
+            "AssociatedValidationReportData" : {
+              "TrustAnchor" : {
+                "VOReference" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+              },
+              "CertificateChain" : {
+                "SigningCertificate" : {
+                  "VOReference" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+                },
+                "TrustAnchor" : {
+                  "VOReference" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+                }
+              },
+              "CryptoInformation" : {
+                "ValidationObjectId" : {
+                  "VOReference" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+                },
+                "Algorithm" : "http://www.w3.org/2000/09/xmldsig#sha1",
+                "SecureAlgorithm" : "false",
+                "NotAfter" : "2012-07-31T21:00:00Z"
+              },
+              "AdditionalValidationReportData" : {
+                "ReportData" : [ {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "The certificate validation is not conclusive!"
+                  }
+                }, {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "No revocation data found for the certificate!"
+                  }
+                } ]
+              }
+            }
+          }
+        }
+      }, {
+        "id" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67",
+        "ObjectType" : "urn:etsi:019102:validationObject:timestamp",
+        "ValidationObjectRepresentation" : {
+          "DigestAlgAndValue" : {
+            "DigestMethod" : {
+              "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+            },
+            "DigestValue" : "KgfLD96w1Xk9qzYgrUkgaRA+8U+OTje/v+IbPl4bxfY="
+          }
+        },
+        "POE" : {
+          "POETime" : "2026-05-27T19:43:06Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation"
+        },
+        "POEProvisioning" : {
+          "POETime" : "2026-05-23T16:04:56Z",
+          "ValidationObject" : [ {
+            "VOReference" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B"
+          }, {
+            "VOReference" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F"
+          }, {
+            "VOReference" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+          }, {
+            "VOReference" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+          }, {
+            "VOReference" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+          }, {
+            "VOReference" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568"
+          } ],
+          "SignatureReference" : {
+            "DigestMethod" : "http://www.w3.org/2001/04/xmlenc#sha256",
+            "DigestValue" : "OwgsIq9v1t6uIKLdZrx1CnuVekazhCdenVuqbdjeoDU="
+          }
+        },
+        "ValidationReport" : {
+          "ValidationConstraintsEvaluationReport" : {
+            "ValidationConstraint" : [ {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:formatChecking",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:passed"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:identificationOfTheSigningCertificate",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:passed"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:validationContextInitialization",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:cryptographicVerification",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:failed",
+                "SubIndication" : "urn:etsi:019102:subindication:HASH_FAILURE",
+                "AssociatedValidationReportData" : {
+                  "AdditionalValidationReportData" : {
+                    "ReportData" : {
+                      "Type" : "urn:cef:dss:message:error",
+                      "Value" : {
+                        "type" : "xs:string",
+                        "" : "The time-stamp message imprint is not intact!"
+                      }
+                    }
+                  }
+                }
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:signatureAcceptanceValidation",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:passed"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:x509CertificateValidation",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:applied"
+              },
+              "ValidationStatus" : {
+                "MainIndication" : "urn:etsi:019102:mainindication:indeterminate",
+                "SubIndication" : "urn:etsi:019102:subindication:CERTIFICATE_CHAIN_GENERAL_FAILURE",
+                "AssociatedValidationReportData" : {
+                  "AdditionalValidationReportData" : {
+                    "ReportData" : [ {
+                      "Type" : "urn:cef:dss:message:error",
+                      "Value" : {
+                        "type" : "xs:string",
+                        "" : "The certificate validation is not conclusive!"
+                      }
+                    }, {
+                      "Type" : "urn:cef:dss:message:error",
+                      "Value" : {
+                        "type" : "xs:string",
+                        "" : "No revocation data found for the certificate!"
+                      }
+                    } ]
+                  }
+                }
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:pastSignatureValidation",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:pastCertificateValidation",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            }, {
+              "ValidationConstraintIdentifier" : "urn:cef:dss:bbb:validationTimeSliding",
+              "ConstraintStatus" : {
+                "Status" : "urn:etsi:019102:constraintStatus:disabled"
+              }
+            } ]
+          },
+          "SignerInformation" : {
+            "SignerCertificate" : {
+              "VOReference" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+            },
+            "Signer" : "pdfgen TSA good"
+          },
+          "SignatureQuality" : {
+            "SignatureQualityInformation" : "urn:cef:dss:timestampQualification:notApplicable"
+          },
+          "SignatureValidationStatus" : {
+            "MainIndication" : "urn:etsi:019102:mainindication:failed",
+            "SubIndication" : "urn:etsi:019102:subindication:HASH_FAILURE",
+            "AssociatedValidationReportData" : {
+              "TrustAnchor" : {
+                "VOReference" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+              },
+              "CertificateChain" : {
+                "SigningCertificate" : {
+                  "VOReference" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B"
+                },
+                "TrustAnchor" : {
+                  "VOReference" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E"
+                }
+              },
+              "CryptoInformation" : {
+                "ValidationObjectId" : {
+                  "VOReference" : "T-0D74C2765D1053208787166EA64D0CF6E34ED7868F996A5A2E04816F6AEB6A67"
+                },
+                "Algorithm" : "http://www.w3.org/2000/09/xmldsig#sha1",
+                "SecureAlgorithm" : "false",
+                "NotAfter" : "2012-07-31T21:00:00Z"
+              },
+              "AdditionalValidationReportData" : {
+                "ReportData" : [ {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "The certificate validation is not conclusive!"
+                  }
+                }, {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "No revocation data found for the certificate!"
+                  }
+                }, {
+                  "Type" : "urn:cef:dss:message:error",
+                  "Value" : {
+                    "type" : "xs:string",
+                    "" : "The time-stamp message imprint is not intact!"
+                  }
+                } ]
+              }
+            }
+          }
+        }
+      }, {
+        "id" : "C-33C0924F35CEB08E1186FFF14602B56FB60632AA131FBB383D3E486F54FC485F",
+        "ObjectType" : "urn:etsi:019102:validationObject:certificate",
+        "ValidationObjectRepresentation" : {
+          "DigestAlgAndValue" : {
+            "DigestMethod" : {
+              "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+            },
+            "DigestValue" : "M8CSTzXOsI4Rhv/xRgK1b7YGMqoTH7s4PT5Ib1T8SF8="
+          }
+        },
+        "POE" : {
+          "POETime" : "2026-05-27T19:43:06Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation"
+        }
+      }, {
+        "id" : "C-4FC29159E3EDAC233F3A099A1D21F133AEE3BD1E75AFA9E40475D21D789E4D7B",
+        "ObjectType" : "urn:etsi:019102:validationObject:certificate",
+        "ValidationObjectRepresentation" : {
+          "DigestAlgAndValue" : {
+            "DigestMethod" : {
+              "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+            },
+            "DigestValue" : "T8KRWePtrCM/OgmaHSHxM67jvR51r6nkBHXSHXieTXs="
+          }
+        },
+        "POE" : {
+          "POETime" : "2026-05-23T16:04:56Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation",
+          "POEObject" : {
+            "VOReference" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+          }
+        }
+      }, {
+        "id" : "C-93BCE1BC1F9DD06EACDDDCF76D3B2A34997038D744C7F8F855147EA4050B3E8E",
+        "ObjectType" : "urn:etsi:019102:validationObject:certificate",
+        "ValidationObjectRepresentation" : {
+          "DigestAlgAndValue" : {
+            "DigestMethod" : {
+              "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+            },
+            "DigestValue" : "k7zhvB+d0G6s3dz3bTsqNJlwONdEx/j4VRR+pAULPo4="
+          }
+        },
+        "POE" : {
+          "POETime" : "2026-05-27T19:43:06Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation"
+        }
+      }, {
+        "id" : "C-D41091D8EC77BF8B7D7478A64D19C415B63B4470481B82216D7859B541287A8B",
+        "ObjectType" : "urn:etsi:019102:validationObject:certificate",
+        "ValidationObjectRepresentation" : {
+          "DigestAlgAndValue" : {
+            "DigestMethod" : {
+              "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+            },
+            "DigestValue" : "1BCR2Ox3v4t9dHimTRnEFbY7RHBIG4IhbXhZtUEoeos="
+          }
+        },
+        "POE" : {
+          "POETime" : "2026-05-27T19:43:06Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation"
+        }
+      }, {
+        "id" : "C-EAF1410636E0DA2C98DFF8C80E9CBD235BE76F9A6ED292197FB6081F4168E193",
+        "ObjectType" : "urn:etsi:019102:validationObject:certificate",
+        "ValidationObjectRepresentation" : {
+          "DigestAlgAndValue" : {
+            "DigestMethod" : {
+              "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+            },
+            "DigestValue" : "6vFBBjbg2iyY3/jIDpy9I1vnb5pu0pIZf7YIH0Fo4ZM="
+          }
+        },
+        "POE" : {
+          "POETime" : "2026-05-27T19:43:06Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation"
+        }
+      }, {
+        "id" : "D-927FDDA72714E5F392923C5936DFF0FC134C19C18EDA7A2CD228E5864AE18568",
+        "ObjectType" : "urn:etsi:019102:validationObject:signedData",
+        "ValidationObjectRepresentation" : {
+          "DigestAlgAndValue" : {
+            "DigestMethod" : {
+              "Algorithm" : "http://www.w3.org/2001/04/xmlenc#sha256"
+            },
+            "DigestValue" : "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+          }
+        },
+        "POE" : {
+          "POETime" : "2026-05-23T16:04:56Z",
+          "TypeOfProof" : "urn:etsi:019102:poetype:validation",
+          "POEObject" : {
+            "VOReference" : "T-29B939E5263359B0216FEC29BF4D6D21D95B802C5C85EB696501EBA620C00F70"
+          }
+        }
+      } ]
+    }
+  },
+  "error" : null
+}
