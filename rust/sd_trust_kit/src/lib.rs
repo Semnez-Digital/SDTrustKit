@@ -726,26 +726,6 @@ fn verify_signature(
     }
 
     if signer_chain_trusted && !has_byte_range_coverage_warning {
-        if signature_timestamp_attr.is_none() {
-            let now = current_unix_seconds();
-            match trust::certificate_is_valid_at_unix_time(&signer_cert_der, now) {
-                Some(true) => steps.push(Step::new(
-                    StepKind::SignerCertificateValidity,
-                    Status::Ok,
-                    "valid at validation time",
-                )),
-                Some(false) => steps.push(Step::new(
-                    StepKind::SignerCertificateValidity,
-                    Status::Fail,
-                    "signer certificate is not valid at validation time and no trusted proof-of-existence is present",
-                )),
-                None => steps.push(Step::new(
-                    StepKind::SignerCertificateValidity,
-                    Status::Warn,
-                    "could not read signer certificate validity period",
-                )),
-            }
-        }
         match trust::cert_allows_document_signing_key_usage(&signer_cert_der) {
             Some(true) => steps.push(Step::new(
                 StepKind::SignerCertificateKeyUsage,
@@ -793,6 +773,14 @@ fn verify_signature(
         ));
     }
 
+    if signer_chain_trusted && !has_byte_range_coverage_warning {
+        append_signer_certificate_validity_step(
+            &mut steps,
+            &signer_cert_der,
+            timestamp_details.as_ref(),
+        );
+    }
+
     let verdict = verdict_for(&steps);
     make_report(
         steps,
@@ -803,6 +791,77 @@ fn verify_signature(
         timestamp_details,
         verdict,
     )
+}
+
+fn append_signer_certificate_validity_step(
+    steps: &mut Vec<Step>,
+    signer_cert_der: &[u8],
+    timestamp_details: Option<&TimestampDetails>,
+) {
+    if let Some(timestamp_time) = timestamp_details
+        .and_then(|details| details.timestamp_time.as_deref())
+        .and_then(revocation::asn1_time_to_unix_seconds)
+    {
+        match trust::certificate_is_valid_at_unix_time(signer_cert_der, timestamp_time) {
+            Some(true) if trusted_signature_timestamp_steps_are_ok(steps) => {
+                steps.push(Step::new(
+                    StepKind::SignerCertificateValidity,
+                    Status::Ok,
+                    "valid at trusted timestamp time",
+                ));
+                return;
+            }
+            Some(false) => {
+                steps.push(Step::new(
+                    StepKind::SignerCertificateValidity,
+                    Status::Fail,
+                    "signer certificate is not valid at timestamp time",
+                ));
+                return;
+            }
+            Some(true) => {}
+            None => {
+                steps.push(Step::new(
+                    StepKind::SignerCertificateValidity,
+                    Status::Warn,
+                    "could not read signer certificate validity period",
+                ));
+                return;
+            }
+        }
+    }
+
+    let now = current_unix_seconds();
+    match trust::certificate_is_valid_at_unix_time(signer_cert_der, now) {
+        Some(true) => steps.push(Step::new(
+            StepKind::SignerCertificateValidity,
+            Status::Ok,
+            "valid at validation time",
+        )),
+        Some(false) => steps.push(Step::new(
+            StepKind::SignerCertificateValidity,
+            Status::Fail,
+            "signer certificate is not valid at validation time and no trusted proof-of-existence is present",
+        )),
+        None => steps.push(Step::new(
+            StepKind::SignerCertificateValidity,
+            Status::Warn,
+            "could not read signer certificate validity period",
+        )),
+    }
+}
+
+fn trusted_signature_timestamp_steps_are_ok(steps: &[Step]) -> bool {
+    step_ok(steps, StepKind::TsaMessageImprint)
+        && step_ok(steps, StepKind::TsaSignatureVerify)
+        && step_ok(steps, StepKind::TsaExtendedKeyUsage)
+        && step_ok(steps, StepKind::TsaCertificateChain)
+}
+
+fn step_ok(steps: &[Step], kind: StepKind) -> bool {
+    steps
+        .iter()
+        .any(|step| step.kind == kind && step.status == Status::Ok)
 }
 
 fn current_unix_seconds() -> f64 {

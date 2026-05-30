@@ -1,5 +1,7 @@
 use base64::Engine;
-use sd_trust_kit::{ValidationIndication, ValidationSubIndication, Verdict, VerificationOptions};
+use sd_trust_kit::{
+    Status, StepKind, ValidationIndication, ValidationSubIndication, Verdict, VerificationOptions,
+};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -56,6 +58,21 @@ fn pdf_generator_tsa_certificate_out_of_bounds_is_indeterminate() {
         report.standards.sub_indication,
         ValidationSubIndication::CertificateChainGeneralFailure
     );
+}
+
+#[test]
+fn pdf_generator_rejects_signature_timestamp_before_signer_validity() {
+    let report = verify_case("ts-gentime-before-signer-validity");
+    let signature = report.signatures.first().expect("signature report");
+
+    assert!(
+        signature.steps.iter().any(|step| {
+            step.kind == StepKind::SignerCertificateValidity && step.status == Status::Fail
+        }),
+        "expected a signer certificate validity failure, got steps: {:#?}",
+        signature.steps
+    );
+    assert_ne!(report.verdict, Verdict::Valid);
 }
 
 #[test]
