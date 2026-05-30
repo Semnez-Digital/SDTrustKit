@@ -1,11 +1,19 @@
 import Darwin
 import Foundation
 
+#if SD_TRUST_KIT_STATIC
+import CSDTrustKit
+#endif
+
 public final class SDTrustKit {
     private let library: SDValidationLibrary
 
     public init(libraryURL: URL? = nil) throws {
+        #if SD_TRUST_KIT_STATIC
+        self.library = try SDValidationLibrary(url: libraryURL)
+        #else
         self.library = try SDValidationLibrary(url: libraryURL ?? Self.defaultLibraryURL())
+        #endif
     }
 
     public func verifyPDF(_ pdf: Data) throws -> ValidationReport {
@@ -103,11 +111,40 @@ private final class SDValidationLibrary {
     let verifyPDFIncludingRevocation: VerifyPDFIncludingRevocation
     let freeString: FreeString
 
-    private let handle: UnsafeMutableRawPointer
+    private let handle: UnsafeMutableRawPointer?
 
-    init(url: URL) throws {
+    init(url: URL?) throws {
+        #if SD_TRUST_KIT_STATIC
+        guard let url else {
+            self.handle = nil
+            self.verifyPDF = { bytes, count in
+                sd_trust_kit_verify_pdf_json(bytes, count)
+            }
+            self.verifyPDFWithOptions = { bytes, count, options in
+                sd_trust_kit_verify_pdf_with_options_json(bytes, count, options)
+            }
+            self.verifyPDFIncludingRevocation = { bytes, count, verificationOptions, revocationOptions in
+                sd_trust_kit_verify_pdf_including_revocation_with_options_json(
+                    bytes,
+                    count,
+                    verificationOptions,
+                    revocationOptions
+                )
+            }
+            self.freeString = { pointer in
+                sd_trust_kit_free_string(pointer)
+            }
+            return
+        }
+        #else
+        guard let url else {
+            throw SDValidationError.libraryLoadFailed(path: "", reason: "No dynamic library URL was provided")
+        }
+        #endif
+
         guard let handle = dlopen(url.path, RTLD_NOW | RTLD_LOCAL) else {
-            throw SDValidationError.libraryLoadFailed(path: url.path, reason: String(cString: dlerror()))
+            let reason = dlerror().map { String(cString: $0) } ?? "unknown dlopen error"
+            throw SDValidationError.libraryLoadFailed(path: url.path, reason: reason)
         }
         self.handle = handle
         do {
@@ -125,7 +162,9 @@ private final class SDValidationLibrary {
     }
 
     deinit {
-        dlclose(handle)
+        if let handle {
+            dlclose(handle)
+        }
     }
 
     private static func symbol<T>(_ handle: UnsafeMutableRawPointer, _ name: String) throws -> T {

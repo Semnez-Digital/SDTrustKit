@@ -161,9 +161,10 @@ fn dss_legacy_adobe_detached_signature_without_signed_attrs_is_chain_inconclusiv
     );
     assert!(
         report.signatures.iter().all(|signature| {
-            signature.steps.iter().all(|step| {
-                step.detail != "PAdES Baseline requires signed attributes"
-            })
+            signature
+                .steps
+                .iter()
+                .all(|step| step.detail != "PAdES Baseline requires signed attributes")
         }),
         "legacy adbe.pkcs7.detached signature was treated as a PAdES baseline signature"
     );
@@ -562,9 +563,10 @@ fn dss_untrusted_signer_chain_dominates_bad_signature_timestamp() {
         report.standards.sub_indication,
         ValidationSubIndication::CertificateChainGeneralFailure
     );
-    assert!(report.signatures[0].steps.iter().any(|step| {
-        step.kind == StepKind::TsaSignatureVerify && step.status == Status::Fail
-    }));
+    assert!(report.signatures[0]
+        .steps
+        .iter()
+        .any(|step| { step.kind == StepKind::TsaSignatureVerify && step.status == Status::Fail }));
 }
 
 #[test]

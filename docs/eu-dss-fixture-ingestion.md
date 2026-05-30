@@ -106,7 +106,7 @@ Use a different pinned DSS commit:
 scripts/ingest_eu_dss_fixtures.py normalize --ref <commit-sha>
 ```
 
-## Comparing Our Validator
+## Comparing SDTrustKit
 
 After the DSS manifest exists, compare it with the local Rust validator:
 
@@ -118,11 +118,12 @@ scripts/compare_eu_dss_fixtures.py
 
 Generated comparison files:
 
-- `reports/ours-vs-dss.jsonl`: raw row-level comparison, including the Rust
-  JSON report for PAdES inputs.
-- `reports/ours-vs-dss.csv`: spreadsheet-friendly row-level comparison.
-- `reports/ours-vs-dss-summary.json`: aggregate counts.
+- `reports/sdtrustkit-vs-eu-dss.jsonl`: raw row-level comparison, including
+  the SDTrustKit JSON report for PAdES inputs.
+- `reports/sdtrustkit-vs-eu-dss.csv`: spreadsheet-friendly row-level
+  comparison.
+- `reports/sdtrustkit-vs-eu-dss-summary.json`: aggregate counts.
 
 The current validator is PAdES/PDF-only. The comparison therefore records
-CAdES, XAdES, and ASiC fixtures as `unsupported` on our side rather than
-running them through a PDF parser and producing misleading results.
+CAdES, XAdES, and ASiC fixtures as `unsupported` on the SDTrustKit side rather
+than running them through a PDF parser and producing misleading results.

@@ -9,6 +9,8 @@ public struct ValidationReport: Decodable, Equatable, Sendable {
     public let signatures: [SignatureReport]
     public let documentTimestamps: [SignatureReport]
     public let standards: StandardsValidationResult
+    public let padesLevel: PAdESLevel
+    public let preservation: PreservationAssessment
 }
 
 public struct SignatureReport: Decodable, Equatable, Sendable {
@@ -24,6 +26,8 @@ public struct SignatureReport: Decodable, Equatable, Sendable {
     public let certificateChain: [CertificateDetails]
     public let timestampDetails: TimestampDetails?
     public let verdict: ValidationVerdict
+    public let padesLevel: PAdESLevel
+    public let preservation: PreservationAssessment
 }
 
 public struct ValidationStep: Decodable, Equatable, Sendable {
@@ -58,6 +62,28 @@ public struct TimestampDetails: Decodable, Equatable, Sendable {
     public let tsaCertificate: CertificateDetails?
     public let tsaCertificateChain: [CertificateDetails]
     public let trustDetail: String?
+}
+
+public struct PreservationAssessment: Decodable, Equatable, Sendable {
+    public let level: PreservationLevel
+    public let label: String
+    public let detail: String
+}
+
+public enum PAdESLevel: String, Decodable, Sendable {
+    case unknown
+    case baselineB
+    case baselineT
+    case baselineLT
+    case baselineLTA
+}
+
+public enum PreservationLevel: String, Decodable, Sendable {
+    case unknown
+    case basic
+    case timestamped
+    case longTerm
+    case archival
 }
 
 public enum StepStatus: String, Decodable, Sendable {

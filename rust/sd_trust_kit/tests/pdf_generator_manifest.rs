@@ -1,7 +1,5 @@
 use base64::Engine;
-use sd_trust_kit::{
-    CrlCache, CrlCacheEntry, RevocationOptions, Verdict, VerificationOptions,
-};
+use sd_trust_kit::{CrlCache, CrlCacheEntry, RevocationOptions, Verdict, VerificationOptions};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::collections::HashSet;

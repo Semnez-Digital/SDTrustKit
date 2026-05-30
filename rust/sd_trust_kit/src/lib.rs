@@ -12,13 +12,14 @@ mod trust;
 
 pub use eu_trusted_list::{EuTrustedCertificate, EuTrustedListCache};
 pub use ffi::{
-    sd_trust_kit_free_string, sd_trust_kit_verify_pdf_including_revocation_with_options_json, sd_trust_kit_verify_pdf_json,
-    sd_trust_kit_verify_pdf_with_options_json,
+    sd_trust_kit_free_string, sd_trust_kit_verify_pdf_including_revocation_with_options_json,
+    sd_trust_kit_verify_pdf_json, sd_trust_kit_verify_pdf_with_options_json,
 };
 pub use options::{TimedTrustAnchorSet, VerificationOptions};
 pub use report::{
-    CertificateDetails, SignatureReport, StandardsValidationResult, Status, Step, StepKind,
-    TimestampDetails, ValidationIndication, ValidationReport, ValidationSubIndication, Verdict,
+    CertificateDetails, PadesLevel, PreservationAssessment, PreservationLevel, SignatureReport,
+    StandardsValidationResult, Status, Step, StepKind, TimestampDetails, ValidationIndication,
+    ValidationReport, ValidationSubIndication, Verdict,
 };
 pub use revocation::{CrlCache, CrlCacheEntry, RevocationOptions, RevocationStatus};
 
@@ -169,6 +170,10 @@ pub fn verify_pdf_with_options(pdf: &[u8], options: &VerificationOptions) -> Val
             signatures,
             document_timestamps,
             standards,
+            pades_level: PadesLevel::Unknown,
+            preservation: PreservationAssessment::unknown(
+                "No PAdES document signature was assessed",
+            ),
         };
     }
 
@@ -276,6 +281,7 @@ fn verify_signature(
     let certificate_chain;
     let mut timestamp_details = None;
     let signed_revision_size = sig.signed_revision_size();
+    let is_pades_baseline = is_pades_baseline_signature(sig);
 
     steps.push(Step::new(
         StepKind::ParsePDF,
@@ -296,6 +302,8 @@ fn verify_signature(
                        certificate_chain: Vec<CertificateDetails>,
                        timestamp_details: Option<TimestampDetails>,
                        verdict: Verdict| {
+        let pades_level = report::pades_level_for_signature_steps(&steps, is_pades_baseline);
+        let preservation = report::preservation_assessment_for_level(pades_level);
         SignatureReport {
             index,
             total,
@@ -309,6 +317,8 @@ fn verify_signature(
             certificate_chain,
             timestamp_details,
             verdict,
+            pades_level,
+            preservation,
         }
     };
 
@@ -459,8 +469,6 @@ fn verify_signature(
         ),
     ));
 
-    let is_pades_baseline = is_pades_baseline_signature(sig);
-
     if cms.e_content.as_deref() == Some(&[]) {
         steps.push(Step::new(
             StepKind::SignatureVerifySignedAttributes,
@@ -502,7 +510,9 @@ fn verify_signature(
             "PAdES signatures must use detached CMS content; encapsulated eContent is present",
         ));
     }
-    if !has_byte_range_coverage_warning && is_pades_baseline && cms.e_content_type_oid != cms::OID_DATA
+    if !has_byte_range_coverage_warning
+        && is_pades_baseline
+        && cms.e_content_type_oid != cms::OID_DATA
     {
         steps.push(Step::new(
             StepKind::PadesBaselineRequirements,
@@ -829,9 +839,9 @@ fn cms_has_malformed_ocsp_archive_cutoff(cms_der: &[u8]) -> bool {
         .position(|window| window == OID_OCSP_ARCHIVE_CUTOFF_DER)
         .is_some_and(|pos| {
             let scan = &cms_der[pos + OID_OCSP_ARCHIVE_CUTOFF_DER.len()..];
-            scan.windows(3).take(64).any(|window| {
-                window[0] == 0x18 && window[1] > 0 && window[2] == b'-'
-            })
+            scan.windows(3)
+                .take(64)
+                .any(|window| window[0] == 0x18 && window[1] > 0 && window[2] == b'-')
         })
 }
 
@@ -1114,6 +1124,7 @@ fn append_revocation_step(
         }
     }
     report.verdict = verdict_for(&report.steps);
+    report.refresh_preservation();
 }
 
 fn signature_revocation_time_unix_seconds(report: &SignatureReport, now_unix_seconds: f64) -> f64 {
@@ -1184,11 +1195,7 @@ mod tests {
 
     #[test]
     fn revocation_time_ignores_untrusted_claimed_signing_time() {
-        let report = test_signature_report(
-            vec![],
-            Some("D:20100101000000Z".to_owned()),
-            None,
-        );
+        let report = test_signature_report(vec![], Some("D:20100101000000Z".to_owned()), None);
 
         assert_eq!(
             signature_revocation_time_unix_seconds(&report, 1_779_530_582.0),
@@ -1242,6 +1249,8 @@ mod tests {
                 trust_detail: None,
             }),
             verdict: Verdict::Inconclusive,
+            pades_level: PadesLevel::BaselineB,
+            preservation: PreservationAssessment::unknown("test report"),
         }
     }
 }

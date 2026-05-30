@@ -300,7 +300,10 @@ pub fn algorithm_identifier_oid_and_params(data: &[u8]) -> Option<(String, Optio
     if oid.tag != 0x06 {
         return None;
     }
-    Some((asn1::oid_string(&oid.content), reader.read_tlv().map(|tlv| tlv.full_bytes)))
+    Some((
+        asn1::oid_string(&oid.content),
+        reader.read_tlv().map(|tlv| tlv.full_bytes),
+    ))
 }
 
 fn parse_attribute(data: &[u8], unwrap_first_value: bool) -> Option<(String, Vec<u8>)> {

@@ -184,6 +184,51 @@ pub struct TimestampDetails {
     pub trust_detail: Option<String>,
 }
 
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum PadesLevel {
+    #[serde(rename = "unknown")]
+    Unknown,
+    #[serde(rename = "baselineB")]
+    BaselineB,
+    #[serde(rename = "baselineT")]
+    BaselineT,
+    #[serde(rename = "baselineLT")]
+    BaselineLT,
+    #[serde(rename = "baselineLTA")]
+    BaselineLTA,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum PreservationLevel {
+    #[serde(rename = "unknown")]
+    Unknown,
+    #[serde(rename = "basic")]
+    Basic,
+    #[serde(rename = "timestamped")]
+    Timestamped,
+    #[serde(rename = "longTerm")]
+    LongTerm,
+    #[serde(rename = "archival")]
+    Archival,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct PreservationAssessment {
+    pub level: PreservationLevel,
+    pub label: String,
+    pub detail: String,
+}
+
+impl PreservationAssessment {
+    pub fn unknown(detail: impl Into<String>) -> Self {
+        Self {
+            level: PreservationLevel::Unknown,
+            label: "Not assessed".to_owned(),
+            detail: detail.into(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SignatureReport {
     pub index: usize,
@@ -206,11 +251,20 @@ pub struct SignatureReport {
     #[serde(rename = "timestampDetails")]
     pub timestamp_details: Option<TimestampDetails>,
     pub verdict: Verdict,
+    #[serde(rename = "padesLevel")]
+    pub pades_level: PadesLevel,
+    pub preservation: PreservationAssessment,
 }
 
 impl SignatureReport {
     pub fn standards(&self) -> StandardsValidationResult {
         standards_result_for(&self.steps)
+    }
+
+    pub fn refresh_preservation(&mut self) {
+        let is_pades_baseline = self.pades_level != PadesLevel::Unknown;
+        self.pades_level = pades_level_for_signature_steps(&self.steps, is_pades_baseline);
+        self.preservation = preservation_assessment_for_level(self.pades_level);
     }
 }
 
@@ -228,6 +282,9 @@ pub struct ValidationReport {
     #[serde(rename = "documentTimestamps")]
     pub document_timestamps: Vec<SignatureReport>,
     pub standards: StandardsValidationResult,
+    #[serde(rename = "padesLevel")]
+    pub pades_level: PadesLevel,
+    pub preservation: PreservationAssessment,
 }
 
 impl ValidationReport {
@@ -239,6 +296,8 @@ impl ValidationReport {
         verdict: Verdict,
     ) -> Self {
         let standards = standards_result_for(&steps);
+        let preservation =
+            PreservationAssessment::unknown("No PAdES document signature was assessed");
         Self {
             steps,
             signer_name,
@@ -248,6 +307,8 @@ impl ValidationReport {
             signatures: vec![],
             document_timestamps: vec![],
             standards,
+            pades_level: PadesLevel::Unknown,
+            preservation,
         }
     }
 }
@@ -283,6 +344,16 @@ pub fn aggregate_report(
     } else {
         aggregate_standards_result(&verdict_reports)
     };
+    let mut pades_level = latest
+        .map(|report| report.pades_level)
+        .unwrap_or(PadesLevel::Unknown);
+    if pades_level == PadesLevel::BaselineLT
+        && document_timestamps
+            .iter()
+            .any(document_timestamp_is_trusted)
+    {
+        pades_level = PadesLevel::BaselineLTA;
+    }
 
     ValidationReport {
         steps: representative
@@ -295,7 +366,114 @@ pub fn aggregate_report(
         signatures,
         document_timestamps,
         standards,
+        pades_level,
+        preservation: preservation_assessment_for_level(pades_level),
     }
+}
+
+pub fn pades_level_for_signature_steps(
+    steps: &[Step],
+    is_pades_baseline_candidate: bool,
+) -> PadesLevel {
+    if !is_pades_baseline_candidate {
+        return PadesLevel::Unknown;
+    }
+    if steps.iter().any(is_pades_level_blocking_failure) {
+        return PadesLevel::Unknown;
+    }
+    if !steps.iter().any(|step| {
+        matches!(
+            step.kind,
+            StepKind::SignatureVerifySignedAttributes | StepKind::SignatureVerifyContent
+        ) && step.status == Status::Ok
+    }) {
+        return PadesLevel::Unknown;
+    }
+
+    let has_trusted_signature_timestamp = step_ok(steps, StepKind::TsaMessageImprint)
+        && step_ok(steps, StepKind::TsaSignatureVerify)
+        && step_ok(steps, StepKind::TsaExtendedKeyUsage)
+        && step_ok(steps, StepKind::TsaCertificateChain);
+    let has_embedded_validation_data = steps.iter().any(|step| {
+        step.kind == StepKind::ByteRangeCoverage
+            && step.status == Status::Ok
+            && step.detail == "Covers signed revision; later revision adds validation data"
+    });
+    let has_valid_revocation_evidence = step_ok(steps, StepKind::RevocationSigner);
+
+    if has_trusted_signature_timestamp
+        && has_embedded_validation_data
+        && has_valid_revocation_evidence
+    {
+        PadesLevel::BaselineLT
+    } else if has_trusted_signature_timestamp {
+        PadesLevel::BaselineT
+    } else {
+        PadesLevel::BaselineB
+    }
+}
+
+pub fn preservation_assessment_for_level(level: PadesLevel) -> PreservationAssessment {
+    match level {
+        PadesLevel::Unknown => PreservationAssessment::unknown(
+            "The signature is not recognized as a valid PAdES baseline profile",
+        ),
+        PadesLevel::BaselineB => PreservationAssessment {
+            level: PreservationLevel::Basic,
+            label: "Basic".to_owned(),
+            detail: "PAdES-B-B: the document signature is intact, but no trusted timestamp was validated".to_owned(),
+        },
+        PadesLevel::BaselineT => PreservationAssessment {
+            level: PreservationLevel::Timestamped,
+            label: "Timestamped".to_owned(),
+            detail: "PAdES-B-T: a trusted timestamp proves the signature existed at the timestamp time".to_owned(),
+        },
+        PadesLevel::BaselineLT => PreservationAssessment {
+            level: PreservationLevel::LongTerm,
+            label: "Long-term".to_owned(),
+            detail: "PAdES-B-LT: trusted timestamp and validation evidence are available for long-term validation".to_owned(),
+        },
+        PadesLevel::BaselineLTA => PreservationAssessment {
+            level: PreservationLevel::Archival,
+            label: "Archive".to_owned(),
+            detail: "PAdES-B-LTA: long-term validation evidence is protected by a trusted document timestamp".to_owned(),
+        },
+    }
+}
+
+fn is_pades_level_blocking_failure(step: &Step) -> bool {
+    step.status == Status::Fail
+        && matches!(
+            step.kind,
+            StepKind::ParsePDF
+                | StepKind::SignatureFieldResolution
+                | StepKind::ByteRangeCoverage
+                | StepKind::ByteRangeBounds
+                | StepKind::DocumentModifiedAfterSigning
+                | StepKind::CmsStructure
+                | StepKind::PadesBaselineRequirements
+                | StepKind::SignerInfoPresent
+                | StepKind::MessageDigestMatches
+                | StepKind::MessageDigestAttribute
+                | StepKind::SignerCertificatePresent
+                | StepKind::SignatureVerifySignedAttributes
+                | StepKind::SignatureVerifyContent
+        )
+}
+
+fn step_ok(steps: &[Step], kind: StepKind) -> bool {
+    steps
+        .iter()
+        .any(|step| step.kind == kind && step.status == Status::Ok)
+}
+
+fn document_timestamp_is_trusted(report: &SignatureReport) -> bool {
+    !report.steps.iter().any(|step| step.status == Status::Fail)
+        && step_ok(&report.steps, StepKind::DocumentTimestamp)
+        && step_ok(&report.steps, StepKind::TsaMessageImprint)
+        && step_ok(&report.steps, StepKind::TsaSignatureVerify)
+        && step_ok(&report.steps, StepKind::TsaExtendedKeyUsage)
+        && step_ok(&report.steps, StepKind::TsaCertificateChain)
 }
 
 fn signer_chain_inconclusive(signatures: &[SignatureReport]) -> bool {
@@ -553,4 +731,168 @@ pub fn format_int_dot(value: usize) -> String {
         out.push(ch);
     }
     out.chars().rev().collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn pades_preservation_detects_basic_profile() {
+        let steps = basic_signature_steps();
+
+        let level = pades_level_for_signature_steps(&steps, true);
+        let preservation = preservation_assessment_for_level(level);
+
+        assert_eq!(level, PadesLevel::BaselineB);
+        assert_eq!(preservation.level, PreservationLevel::Basic);
+        assert_eq!(preservation.label, "Basic");
+    }
+
+    #[test]
+    fn pades_preservation_promotes_trusted_timestamp_to_t() {
+        let mut steps = basic_signature_steps();
+        steps.extend(trusted_timestamp_steps());
+
+        let level = pades_level_for_signature_steps(&steps, true);
+        let preservation = preservation_assessment_for_level(level);
+
+        assert_eq!(level, PadesLevel::BaselineT);
+        assert_eq!(preservation.level, PreservationLevel::Timestamped);
+        assert_eq!(preservation.label, "Timestamped");
+    }
+
+    #[test]
+    fn pades_preservation_promotes_embedded_validation_data_and_revocation_to_lt() {
+        let mut steps = basic_signature_steps();
+        steps.extend(trusted_timestamp_steps());
+        steps.push(Step::new(
+            StepKind::ByteRangeCoverage,
+            Status::Ok,
+            "Covers signed revision; later revision adds validation data",
+        ));
+        steps.push(Step::new(
+            StepKind::RevocationSigner,
+            Status::Ok,
+            "certificate is not listed in the current CRL",
+        ));
+
+        let level = pades_level_for_signature_steps(&steps, true);
+        let preservation = preservation_assessment_for_level(level);
+
+        assert_eq!(level, PadesLevel::BaselineLT);
+        assert_eq!(preservation.level, PreservationLevel::LongTerm);
+        assert_eq!(preservation.label, "Long-term");
+    }
+
+    #[test]
+    fn aggregate_preservation_promotes_lt_with_trusted_document_timestamp_to_lta() {
+        let signature = signature_report(PadesLevel::BaselineLT);
+        let document_timestamp = SignatureReport {
+            index: 2,
+            total: 2,
+            signed_revision_size: 10,
+            current_file_size: 10,
+            byte_range: vec![0, 1, 2, 3],
+            steps: trusted_document_timestamp_steps(),
+            signer_name: None,
+            signing_time: None,
+            signer_certificate: None,
+            certificate_chain: vec![],
+            timestamp_details: None,
+            verdict: Verdict::Valid,
+            pades_level: PadesLevel::Unknown,
+            preservation: PreservationAssessment::unknown("document timestamp"),
+        };
+
+        let report = aggregate_report(
+            vec![signature],
+            vec![document_timestamp],
+            vec![],
+            vec!["Signer".to_owned()],
+        );
+
+        assert_eq!(report.pades_level, PadesLevel::BaselineLTA);
+        assert_eq!(report.preservation.level, PreservationLevel::Archival);
+        assert_eq!(report.preservation.label, "Archive");
+    }
+
+    #[test]
+    fn pades_preservation_does_not_promote_untrusted_timestamp() {
+        let mut steps = basic_signature_steps();
+        steps.push(Step::new(StepKind::TsaMessageImprint, Status::Ok, "ok"));
+        steps.push(Step::new(StepKind::TsaSignatureVerify, Status::Ok, "ok"));
+        steps.push(Step::new(StepKind::TsaExtendedKeyUsage, Status::Ok, "ok"));
+        steps.push(Step::new(
+            StepKind::TsaCertificateChain,
+            Status::Warn,
+            "no path to configured timestamp trust anchors or pins",
+        ));
+
+        assert_eq!(
+            pades_level_for_signature_steps(&steps, true),
+            PadesLevel::BaselineB
+        );
+    }
+
+    #[test]
+    fn pades_preservation_blocks_malformed_baseline_signature() {
+        let mut steps = basic_signature_steps();
+        steps.push(Step::new(
+            StepKind::PadesBaselineRequirements,
+            Status::Fail,
+            "PAdES signatures must use detached CMS content; encapsulated eContent is present",
+        ));
+
+        let level = pades_level_for_signature_steps(&steps, true);
+
+        assert_eq!(level, PadesLevel::Unknown);
+    }
+
+    fn basic_signature_steps() -> Vec<Step> {
+        vec![
+            Step::new(StepKind::ParsePDF, Status::Ok, "ok"),
+            Step::new(StepKind::ByteRangeCoverage, Status::Ok, "ok"),
+            Step::new(StepKind::ByteRangeBounds, Status::Ok, "ok"),
+            Step::new(StepKind::CmsStructure, Status::Ok, "ok"),
+            Step::new(StepKind::SignerInfoPresent, Status::Ok, "ok"),
+            Step::new(StepKind::MessageDigestMatches, Status::Ok, "ok"),
+            Step::new(StepKind::SignatureVerifySignedAttributes, Status::Ok, "ok"),
+            Step::new(StepKind::SignerCertificatePresent, Status::Ok, "ok"),
+        ]
+    }
+
+    fn trusted_timestamp_steps() -> Vec<Step> {
+        vec![
+            Step::new(StepKind::TsaMessageImprint, Status::Ok, "ok"),
+            Step::new(StepKind::TsaSignatureVerify, Status::Ok, "ok"),
+            Step::new(StepKind::TsaExtendedKeyUsage, Status::Ok, "ok"),
+            Step::new(StepKind::TsaCertificateChain, Status::Ok, "ok"),
+        ]
+    }
+
+    fn trusted_document_timestamp_steps() -> Vec<Step> {
+        let mut steps = vec![Step::new(StepKind::DocumentTimestamp, Status::Ok, "ok")];
+        steps.extend(trusted_timestamp_steps());
+        steps
+    }
+
+    fn signature_report(pades_level: PadesLevel) -> SignatureReport {
+        SignatureReport {
+            index: 1,
+            total: 1,
+            signed_revision_size: 10,
+            current_file_size: 10,
+            byte_range: vec![0, 1, 2, 3],
+            steps: basic_signature_steps(),
+            signer_name: Some("Signer".to_owned()),
+            signing_time: None,
+            signer_certificate: None,
+            certificate_chain: vec![],
+            timestamp_details: None,
+            verdict: Verdict::Valid,
+            pades_level,
+            preservation: preservation_assessment_for_level(pades_level),
+        }
+    }
 }

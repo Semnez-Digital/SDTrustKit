@@ -66,7 +66,10 @@ struct FfiErrorBody<'a> {
 /// `pdf` must point to `pdf_len` readable bytes, unless `pdf_len` is zero and
 /// `pdf` is null. The returned pointer must be released with
 /// `sd_trust_kit_free_string`.
-pub unsafe extern "C" fn sd_trust_kit_verify_pdf_json(pdf: *const u8, pdf_len: usize) -> *mut c_char {
+pub unsafe extern "C" fn sd_trust_kit_verify_pdf_json(
+    pdf: *const u8,
+    pdf_len: usize,
+) -> *mut c_char {
     ffi_json_string(|| {
         let pdf = unsafe { raw_bytes(pdf, pdf_len, "pdf")? };
         serialize_report(&verify_pdf(pdf))

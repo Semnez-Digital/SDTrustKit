@@ -1,0 +1,4 @@
+module CSDTrustKit {
+  header "sd_trust_kit.h"
+  export *
+}

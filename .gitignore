@@ -1,10 +1,22 @@
 target/
 **/target/
 **/.build/
+**/.swiftpm/
+build/
 __pycache__/
 **/__pycache__/
 
 validation-corpus/
+!validation-corpus/
+validation-corpus/*
+!validation-corpus/performance-reports/
+validation-corpus/performance-reports/*
+!validation-corpus/performance-reports/README.md
+!validation-corpus/performance-reports/latest-pdf-benchmark.html
+!validation-corpus/performance-reports/2026-05-28-public-offline-pdf-validation/
+!validation-corpus/performance-reports/2026-05-28-public-offline-pdf-validation/**
+validation-corpus/performance-reports/**/__pycache__/
+validation-corpus/performance-reports/**/*.pyc
 
 .DS_Store
 *.swp

@@ -127,6 +127,12 @@ struct SDTrustKitTests {
                 "indication": "passed",
                 "subIndication": "none",
                 "diagnostic": null
+              },
+              "padesLevel": "baselineT",
+              "preservation": {
+                "level": "timestamped",
+                "label": "Timestamped",
+                "detail": "trusted time"
               }
             }
             """.utf8
@@ -135,6 +141,9 @@ struct SDTrustKitTests {
         let report = try JSONDecoder.rustReport.decode(ValidationReport.self, from: json)
 
         #expect(report.steps.count == kinds.count)
+        #expect(report.padesLevel == .baselineT)
+        #expect(report.preservation.level == .timestamped)
+        #expect(report.preservation.label == "Timestamped")
         #expect(report.steps.map(\.kind).contains(.signatureFieldResolution))
         #expect(report.steps.map(\.kind).contains(.padesBaselineRequirements))
         #expect(report.steps.map(\.kind).contains(.signerCertificateValidity))

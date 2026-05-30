@@ -1,7 +1,5 @@
 use base64::Engine;
-use sd_trust_kit::{
-    ValidationIndication, ValidationSubIndication, Verdict, VerificationOptions,
-};
+use sd_trust_kit::{ValidationIndication, ValidationSubIndication, Verdict, VerificationOptions};
 use std::fs;
 use std::path::{Path, PathBuf};
 

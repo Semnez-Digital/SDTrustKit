@@ -40,14 +40,14 @@ def canonical_dss(value: str) -> str:
     return value.lower() or "unknown"
 
 
-def canonical_ours(value: str) -> str:
+def canonical_sdtrustkit(value: str) -> str:
     lowered = value.lower()
     if lowered in {"nosignatures", "no_signatures", "no-signatures"}:
         return "no_signatures"
     return lowered or "unknown"
 
 
-def run_ours(binary: Path, path: Path, timeout: float) -> dict[str, object]:
+def run_sdtrustkit(binary: Path, path: Path, timeout: float) -> dict[str, object]:
     started = time.perf_counter()
     try:
         completed = subprocess.run(
@@ -118,11 +118,11 @@ def unsupported_result(kind: str) -> dict[str, object]:
     }
 
 
-def compare_row(dss: dict[str, object], ours: dict[str, object]) -> dict[str, object]:
+def compare_row(dss: dict[str, object], sdtrustkit: dict[str, object]) -> dict[str, object]:
     dss_aggregate = str(dss.get("dss_aggregate", ""))
-    ours_aggregate = str(ours.get("aggregate", ""))
+    sdtrustkit_aggregate = str(sdtrustkit.get("aggregate", ""))
     dss_canonical = canonical_dss(dss_aggregate)
-    ours_canonical = canonical_ours(ours_aggregate)
+    sdtrustkit_canonical = canonical_sdtrustkit(sdtrustkit_aggregate)
     return {
         "resource": dss["resource"],
         "kind": dss["kind"],
@@ -138,21 +138,21 @@ def compare_row(dss: dict[str, object], ours: dict[str, object]) -> dict[str, ob
             "sub_indications": dss.get("sub_indications", []),
             "error": dss.get("error", ""),
         },
-        "ours": {
-            "supported": ours["supported"],
-            "aggregate": ours_aggregate,
-            "canonical": ours_canonical,
-            "verdict": ours["verdict"],
-            "signature_count": ours["signature_count"],
-            "standards_indication": ours["standards_indication"],
-            "standards_sub_indication": ours["standards_sub_indication"],
-            "exit_code": ours["exit_code"],
-            "ms": ours["ms"],
-            "error": ours["error"],
-            "report": ours["report"],
+        "sdtrustkit": {
+            "supported": sdtrustkit["supported"],
+            "aggregate": sdtrustkit_aggregate,
+            "canonical": sdtrustkit_canonical,
+            "verdict": sdtrustkit["verdict"],
+            "signature_count": sdtrustkit["signature_count"],
+            "standards_indication": sdtrustkit["standards_indication"],
+            "standards_sub_indication": sdtrustkit["standards_sub_indication"],
+            "exit_code": sdtrustkit["exit_code"],
+            "ms": sdtrustkit["ms"],
+            "error": sdtrustkit["error"],
+            "report": sdtrustkit["report"],
         },
-        "match": dss_canonical == ours_canonical,
-        "pair": f"{dss_canonical}->{ours_canonical}",
+        "match": dss_canonical == sdtrustkit_canonical,
+        "pair": f"{dss_canonical}->{sdtrustkit_canonical}",
     }
 
 
@@ -163,15 +163,15 @@ def write_csv(path: Path, rows: list[dict[str, object]]) -> None:
         "kind",
         "bytes",
         "dss",
-        "ours",
+        "sdtrustkit",
         "match",
         "pair",
-        "ours_ms",
+        "sdtrustkit_ms",
         "dss_signature_count",
-        "ours_signature_count",
+        "sdtrustkit_signature_count",
         "dss_sub_indications",
-        "ours_sub_indication",
-        "ours_error",
+        "sdtrustkit_sub_indication",
+        "sdtrustkit_error",
         "sha256",
     ]
     with path.open("w", newline="", encoding="utf-8") as f:
@@ -184,15 +184,15 @@ def write_csv(path: Path, rows: list[dict[str, object]]) -> None:
                     "kind": row["kind"],
                     "bytes": row["bytes"],
                     "dss": row["dss"]["canonical"],
-                    "ours": row["ours"]["canonical"],
+                    "sdtrustkit": row["sdtrustkit"]["canonical"],
                     "match": row["match"],
                     "pair": row["pair"],
-                    "ours_ms": row["ours"]["ms"],
+                    "sdtrustkit_ms": row["sdtrustkit"]["ms"],
                     "dss_signature_count": row["dss"]["signature_count"],
-                    "ours_signature_count": row["ours"]["signature_count"],
+                    "sdtrustkit_signature_count": row["sdtrustkit"]["signature_count"],
                     "dss_sub_indications": "|".join(row["dss"]["sub_indications"]),
-                    "ours_sub_indication": row["ours"]["standards_sub_indication"],
-                    "ours_error": row["ours"]["error"],
+                    "sdtrustkit_sub_indication": row["sdtrustkit"]["standards_sub_indication"],
+                    "sdtrustkit_error": row["sdtrustkit"]["error"],
                     "sha256": row["sha256"],
                 }
             )
@@ -200,16 +200,20 @@ def write_csv(path: Path, rows: list[dict[str, object]]) -> None:
 
 def summarize(rows: list[dict[str, object]]) -> dict[str, object]:
     pades = [row for row in rows if row["kind"] == "pades"]
-    supported = [row for row in rows if row["ours"]["supported"]]
-    unsupported = [row for row in rows if not row["ours"]["supported"]]
+    supported = [row for row in rows if row["sdtrustkit"]["supported"]]
+    unsupported = [row for row in rows if not row["sdtrustkit"]["supported"]]
     mismatches = [row for row in rows if not row["match"]]
     pades_mismatches = [row for row in pades if not row["match"]]
-    ours_times = [float(row["ours"]["ms"]) for row in supported if row["ours"]["ms"] is not None]
+    sdtrustkit_times = [
+        float(row["sdtrustkit"]["ms"])
+        for row in supported
+        if row["sdtrustkit"]["ms"] is not None
+    ]
     return {
         "total": len(rows),
         "by_kind": Counter(row["kind"] for row in rows),
         "dss_by_aggregate": Counter(row["dss"]["canonical"] for row in rows),
-        "ours_by_aggregate": Counter(row["ours"]["canonical"] for row in rows),
+        "sdtrustkit_by_aggregate": Counter(row["sdtrustkit"]["canonical"] for row in rows),
         "supported_count": len(supported),
         "unsupported_count": len(unsupported),
         "match_count": sum(1 for row in rows if row["match"]),
@@ -219,16 +223,18 @@ def summarize(rows: list[dict[str, object]]) -> dict[str, object]:
         "pades_mismatch_count": len(pades_mismatches),
         "mismatches_by_pair": Counter(row["pair"] for row in mismatches),
         "pades_mismatches_by_pair": Counter(row["pair"] for row in pades_mismatches),
-        "ours_ms": {
-            "min": round(min(ours_times), 3) if ours_times else None,
-            "max": round(max(ours_times), 3) if ours_times else None,
-            "avg": round(sum(ours_times) / len(ours_times), 3) if ours_times else None,
+        "sdtrustkit_ms": {
+            "min": round(min(sdtrustkit_times), 3) if sdtrustkit_times else None,
+            "max": round(max(sdtrustkit_times), 3) if sdtrustkit_times else None,
+            "avg": round(sum(sdtrustkit_times) / len(sdtrustkit_times), 3)
+            if sdtrustkit_times
+            else None,
         },
     }
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Compare local PAdES validator output against normalized EU-DSS fixture verdicts.")
+    parser = argparse.ArgumentParser(description="Compare SDTrustKit output against normalized EU-DSS fixture verdicts.")
     parser.add_argument("--base", type=Path, default=DEFAULT_BASE)
     parser.add_argument("--binary", type=Path, default=DEFAULT_BIN)
     parser.add_argument("--timeout", type=float, default=30.0)
@@ -243,9 +249,9 @@ def main() -> None:
     dss_jsonl = base / "reports" / "dss-normalized.jsonl"
     resource_root = base / "resources"
     reports = base / "reports"
-    comparison_jsonl = reports / "ours-vs-dss.jsonl"
-    comparison_csv = reports / "ours-vs-dss.csv"
-    summary_json = reports / "ours-vs-dss-summary.json"
+    comparison_jsonl = reports / "sdtrustkit-vs-eu-dss.jsonl"
+    comparison_csv = reports / "sdtrustkit-vs-eu-dss.csv"
+    summary_json = reports / "sdtrustkit-vs-eu-dss-summary.json"
 
     if not dss_jsonl.exists():
         raise SystemExit(f"Missing DSS JSONL: {dss_jsonl}")
@@ -261,10 +267,10 @@ def main() -> None:
         for idx, dss in enumerate(dss_rows, start=1):
             kind = str(dss.get("kind", ""))
             if kind == "pades":
-                ours = run_ours(binary, resource_root / str(dss["resource"]), args.timeout)
+                sdtrustkit = run_sdtrustkit(binary, resource_root / str(dss["resource"]), args.timeout)
             else:
-                ours = unsupported_result(kind)
-            row = compare_row(dss, ours)
+                sdtrustkit = unsupported_result(kind)
+            row = compare_row(dss, sdtrustkit)
             rows.append(row)
             out.write(json.dumps(row, sort_keys=True) + "\n")
             if idx % 50 == 0:

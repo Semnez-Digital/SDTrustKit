@@ -1,8 +1,14 @@
 # SDTrustKit Rust Core
 
 Portable Rust validation core for PAdES/PDF signature verification. The Swift
-package in `Packages/CEISignPDFValidation` remains the reference implementation
-until the Rust snapshots match the checked-in baselines.
+package in `../../swift/SDTrustKit` links this core through a static
+XCFramework for app integration.
+
+Current version: `1.0.0`.
+
+`1.0.0` is the first public release line. Serialized reports include
+`padesLevel` and `preservation` fields on the top-level
+`ValidationReport` and each document `SignatureReport`.
 
 Phase 1 is intentionally offline and deterministic:
 
@@ -15,9 +21,9 @@ Phase 1 is intentionally offline and deterministic:
 - evaluate pinned offline anchors where enough chain data is available
 - load caller-owned trust fixtures for deterministic parity/debug runs
 
-Network-backed revocation refresh, EU trusted-list refresh, and higher-level
-Swift/Kotlin/C# wrappers are deliberately deferred. Wrappers are dessert, not
-dinner.
+Network-backed revocation refresh and EU trusted-list refresh remain wrapper/app
+responsibilities. The core accepts caller-owned trust anchors, timestamp pins,
+EU trusted-list cache snapshots, and deterministic CRL cache entries.
 
 Run from this directory once Rust is installed:
 
@@ -51,5 +57,10 @@ Build the native library with:
 cargo build --release
 ```
 
-A thin Swift wrapper prototype is available at
-`../../swift/SDTrustKit`.
+Build the Apple XCFramework used by SwiftPM with:
+
+```sh
+../../scripts/build_xcframework.sh
+```
+
+Distribution notes live in `../../docs/xcframework-distribution.md`.

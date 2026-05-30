@@ -1,5 +1,11 @@
 # SDTrustKit Migration Notes
 
+Current release: `1.0.0`.
+
+`1.0.0` is the first public release line. `ValidationReport` and document
+`SignatureReport` include `padesLevel` and `preservation` fields in the Rust
+JSON and Swift DTOs.
+
 The Rust core lives in `rust/sd_trust_kit` and exposes the phase-1
 entry point:
 
@@ -41,8 +47,10 @@ caller-owned trust sources:
 - `system_trust_anchors`: the minimal macOS roots needed to reproduce the
   current Swift offline baseline deterministically.
 
-The Swift validator in `Packages/CEISignPDFValidation` remains the reference
-implementation until corpus parity is proven. Do not remove it yet.
+The CEISign app currently consumes `Packages/CEISignPDFValidation` and its
+`PdfVerifier` surface. Keep that package as the app-facing adapter during the
+first integration so CEISign UI code can keep importing `CEISignPDFValidation`
+while validation behavior moves to SDTrustKit underneath it.
 
 ## Wrapper Shape
 
@@ -128,28 +136,91 @@ provide `cacheKeySha256` instead when it already owns a cache keyed by normalize
 CRL URL hash. `nowUnixSeconds` is required when `crlCacheEntries` is non-empty
 so CRL expiration checks are deterministic.
 
-## Swift Prototype
+## Swift Package And XCFramework
 
-The first thin wrapper prototype lives in `swift/SDTrustKit`. It
-loads the Rust dynamic library with `dlopen`, calls the exported C ABI, frees
-returned strings with `sd_trust_kit_free_string`, and decodes the Rust
-`ValidationReport` JSON into Swift DTOs.
+The Swift package lives in `swift/SDTrustKit`. It links the packaged
+`CSDTrustKit.xcframework`, calls the exported C ABI, frees returned strings with
+`sd_trust_kit_free_string`, and decodes the Rust `ValidationReport` JSON into
+Swift DTOs.
 
-Build and test it from the Swift package directory:
+The XCFramework supports iOS device, iOS simulator, and macOS:
+
+- `ios-arm64`
+- `ios-arm64_x86_64-simulator`
+- `macos-arm64_x86_64`
+
+Rebuild it from the repository root:
 
 ```sh
-cargo build --release --manifest-path ../../rust/sd_trust_kit/Cargo.toml
+scripts/build_xcframework.sh
+```
+
+Build and test the Swift package from the package directory:
+
+```sh
 swift test
 ```
 
-The wrapper defaults to
-`../../rust/sd_trust_kit/target/release/libsd_trust_kit.dylib`
-and can be pointed at another build with `SD_TRUST_KIT_DYLIB`.
+The package also supports local dylib experiments when compiled without
+`SD_TRUST_KIT_STATIC`; pass `libraryURL:` or set `SD_TRUST_KIT_DYLIB`.
 
 The Swift tests cover core verification, caller-owned trust options,
 revocation-cache options, and a corpus smoke test that compares Swift-decoded
 output against the Rust CLI for `0001.pdf` when the sibling reference corpus is
 available.
+
+For CEISign, add `swift/SDTrustKit` as a package dependency and initially make
+`CEISignPDFValidation` depend on `SDTrustKit`. Map the existing `PdfVerifier`
+types and trust-provider hooks to `ValidationReport`, `VerificationOptions`,
+and `RevocationOptions` inside that adapter before changing app imports.
+
+Keep network fetches, CRL refresh, EU trusted-list refresh, and pinned trust
+ownership in CEISign. SDTrustKit consumes caller-owned trust anchors, timestamp
+pins, EU trusted-list cache snapshots, and cached CRLs; it does not fetch or
+pin remote material itself.
+
+## Preservation Labels And Badge Policy
+
+`ValidationReport` and every document `SignatureReport` expose two UI-oriented
+fields:
+
+- `padesLevel`: `unknown`, `baselineB`, `baselineT`, `baselineLT`, or
+  `baselineLTA`.
+- `preservation`: a structured label/detail pair with levels `unknown`,
+  `basic`, `timestamped`, `longTerm`, or `archival`.
+
+These fields describe preservation strength, not the badge color by themselves.
+CEISign should keep badge color tied to `verdict` and `standards`:
+
+- Green: the signature is valid under the evidence CEISign supplied.
+- Yellow: the document signature is cryptographically intact, but trust,
+  timestamp, or revocation evidence is incomplete.
+- Red: the document was modified, the digest/signature does not match, the
+  signer was revoked before signing, or the signature/container is malformed.
+
+Recommended user-facing labels:
+
+- Basic: PAdES-B-B. The document signature is intact, but no trusted timestamp
+  was validated. This can be green when the signature is valid now, but the UI
+  should explain that long-term validity may require fresh evidence.
+- Timestamped: PAdES-B-T. A trusted timestamp proves the signature existed at
+  the timestamp time.
+- Long-term: PAdES-B-LT. Trusted timestamp and validation evidence are
+  available for long-term validation.
+- Archive: PAdES-B-LTA. Long-term validation evidence is protected by a trusted
+  document timestamp.
+
+The classifier is intentionally conservative. It promotes to B-T only when the
+signature timestamp imprint, signature, EKU, and timestamp chain all validate.
+It promotes to B-LT only when B-T evidence is present, validation-data-only PDF
+updates are detected, and signer revocation evidence validates. It promotes the
+top-level report to B-LTA only when a trusted document timestamp is also present.
+
+For CEISign UI purposes, treat `padesLevel` and `preservation` as explanatory
+metadata. A valid PAdES-B-B signature may receive a green badge because the
+signature is valid under the supplied evidence, while its preservation label
+should remain `Basic`. A valid PAdES-B-T signature may also receive a green
+badge, with the preservation label `Timestamped`.
 
 ## Local CLI
 
@@ -166,11 +237,11 @@ by the Rust corpus tests without moving trust pins into the core:
 ```sh
 cargo run --bin sd-trust-validate -- \
   --offline-fixtures tests/fixtures \
-  /Users/cristian/Development/CEISign/testpdfs/sources/0001.pdf
+  /path/to/signed.pdf
 
 cargo run --bin sd-trust-validate -- \
   --full-fixtures tests/fixtures \
-  /Users/cristian/Development/CEISign/testpdfs/sources/0001.pdf
+  /path/to/signed.pdf
 ```
 
 `--offline-fixtures` supplies only the deterministic system roots used by the

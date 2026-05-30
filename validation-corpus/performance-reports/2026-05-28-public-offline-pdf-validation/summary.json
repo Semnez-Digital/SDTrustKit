@@ -1,0 +1,568 @@
+{
+  "title": "Offline PDF validation benchmark: SDTrustKit vs EU DSS vs pyHanko",
+  "generated_at_utc": "2026-05-28T17:13:27+00:00",
+  "corpus_root": "validation-corpus/combined-pdfs",
+  "pdf_rows": 1665,
+  "iterations": 3,
+  "warmups": 1,
+  "network_policy": "Offline. EU DSS used IgnoreDataLoader and a macOS sandbox denying network egress; SDTrustKit and pyHanko used local bytes/trust inputs only. pyHanko ValidationContext was created with allow_fetching=False.",
+  "versions": {
+    "sdtrustkit": "1.0.0",
+    "eu_dss": "6.2 harness from dss-corpus-validator-jar-with-dependencies.jar",
+    "pyhanko": "0.35.1"
+  },
+  "timing": {
+    "sdtrustkit": {
+      "rows": 1665,
+      "avg_ms": 62.069,
+      "median_ms": 7.115,
+      "p95_ms": 158.575,
+      "p99_ms": 1181.831,
+      "max_ms": 15524.742
+    },
+    "eu_dss": {
+      "rows": 1665,
+      "avg_ms": 178.154,
+      "median_ms": 88.903,
+      "p95_ms": 406.587,
+      "p99_ms": 1183.369,
+      "max_ms": 23744.62
+    },
+    "pyhanko": {
+      "rows": 1665,
+      "avg_ms": 78.454,
+      "median_ms": 48.721,
+      "p95_ms": 180.717,
+      "p99_ms": 733.576,
+      "max_ms": 5413.815
+    }
+  },
+  "ratios": {
+    "eu_dss_over_sdtrustkit": {
+      "rows": 1663,
+      "avg": 20.011,
+      "median": 13.934,
+      "p95": 63.532,
+      "p99": 121.465,
+      "max": 456.367
+    },
+    "pyhanko_over_sdtrustkit": {
+      "rows": 1663,
+      "avg": 5.814,
+      "median": 4.867,
+      "p95": 16.0,
+      "p99": 27.864,
+      "max": 37.3
+    },
+    "pyhanko_over_eu_dss": {
+      "rows": 1665,
+      "avg": 0.75,
+      "median": 0.446,
+      "p95": 2.656,
+      "p99": 3.929,
+      "max": 8.873
+    }
+  },
+  "results": {
+    "sdtrustkit": {
+      "Inconclusive": 1526,
+      "Invalid": 96,
+      "NO_SIGNATURES": 36,
+      "Error": 7
+    },
+    "eu_dss": {
+      "Inconclusive": 1520,
+      "Invalid": 94,
+      "NO_SIGNATURES": 41,
+      "Error": 10
+    },
+    "pyhanko": {
+      "Inconclusive": 1229,
+      "Invalid": 35,
+      "Error": 377,
+      "Valid": 1,
+      "NO_SIGNATURES": 23
+    }
+  },
+  "agreement": {
+    "sdtrustkit_vs_eu_dss": {
+      "same": 1657,
+      "Inconclusive->NO_SIGNATURES": 3,
+      "Invalid->NO_SIGNATURES": 2,
+      "Inconclusive->Error": 3
+    },
+    "sdtrustkit_vs_pyhanko": {
+      "same": 1257,
+      "Invalid->Error": 40,
+      "Inconclusive->Error": 322,
+      "Inconclusive->Valid": 1,
+      "NO_SIGNATURES->Error": 13,
+      "Inconclusive->Invalid": 3,
+      "Error->Inconclusive": 5,
+      "Invalid->Inconclusive": 24
+    }
+  },
+  "slowest": {
+    "sdtrustkit": [
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_236.pdf",
+        "bytes": 2226092,
+        "sdtrustkit_avg_ms": 15524.742,
+        "eu_dss_avg_ms": 4700.633,
+        "pyhanko_avg_ms": 1183.613
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/51sigs.pdf",
+        "bytes": 4635107,
+        "sdtrustkit_avg_ms": 4232.432,
+        "eu_dss_avg_ms": 23584.99,
+        "pyhanko_avg_ms": 5148.376
+      },
+      {
+        "file": "signed_pdfs/sources/dss/51sigs.pdf",
+        "bytes": 4635107,
+        "sdtrustkit_avg_ms": 4174.67,
+        "eu_dss_avg_ms": 23744.62,
+        "pyhanko_avg_ms": 5230.434
+      },
+      {
+        "file": "signed_pdfs/diversity/dss__51sigs.pdf",
+        "bytes": 4635107,
+        "sdtrustkit_avg_ms": 4158.638,
+        "eu_dss_avg_ms": 21358.486,
+        "pyhanko_avg_ms": 5413.815
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_26.pdf",
+        "bytes": 1483768,
+        "sdtrustkit_avg_ms": 4128.864,
+        "eu_dss_avg_ms": 1326.824,
+        "pyhanko_avg_ms": 652.27
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_300.pdf",
+        "bytes": 1598560,
+        "sdtrustkit_avg_ms": 3877.092,
+        "eu_dss_avg_ms": 1240.642,
+        "pyhanko_avg_ms": 632.339
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_418.pdf",
+        "bytes": 1099470,
+        "sdtrustkit_avg_ms": 2880.798,
+        "eu_dss_avg_ms": 859.357,
+        "pyhanko_avg_ms": 517.656
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2024_154.pdf",
+        "bytes": 8342527,
+        "sdtrustkit_avg_ms": 2472.333,
+        "eu_dss_avg_ms": 1398.691,
+        "pyhanko_avg_ms": 882.102
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_406.pdf",
+        "bytes": 2107881,
+        "sdtrustkit_avg_ms": 2082.02,
+        "eu_dss_avg_ms": 1165.318,
+        "pyhanko_avg_ms": 618.072
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_100.pdf",
+        "bytes": 38455672,
+        "sdtrustkit_avg_ms": 2022.726,
+        "eu_dss_avg_ms": 1250.26,
+        "pyhanko_avg_ms": 4317.203
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2024_108.pdf",
+        "bytes": 2391034,
+        "sdtrustkit_avg_ms": 1837.088,
+        "eu_dss_avg_ms": 1183.369,
+        "pyhanko_avg_ms": 631.273
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_259.pdf",
+        "bytes": 1182282,
+        "sdtrustkit_avg_ms": 1719.586,
+        "eu_dss_avg_ms": 582.615,
+        "pyhanko_avg_ms": 429.508
+      }
+    ],
+    "eu_dss": [
+      {
+        "file": "signed_pdfs/sources/dss/51sigs.pdf",
+        "bytes": 4635107,
+        "eu_dss_avg_ms": 23744.62,
+        "sdtrustkit_avg_ms": 4174.67,
+        "pyhanko_avg_ms": 5230.434
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/51sigs.pdf",
+        "bytes": 4635107,
+        "eu_dss_avg_ms": 23584.99,
+        "sdtrustkit_avg_ms": 4232.432,
+        "pyhanko_avg_ms": 5148.376
+      },
+      {
+        "file": "signed_pdfs/diversity/dss__51sigs.pdf",
+        "bytes": 4635107,
+        "eu_dss_avg_ms": 21358.486,
+        "sdtrustkit_avg_ms": 4158.638,
+        "pyhanko_avg_ms": 5413.815
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_236.pdf",
+        "bytes": 2226092,
+        "eu_dss_avg_ms": 4700.633,
+        "sdtrustkit_avg_ms": 15524.742,
+        "pyhanko_avg_ms": 1183.613
+      },
+      {
+        "file": "signed_pdfs/diversity/dss-more__CZ.pdf",
+        "bytes": 3851825,
+        "eu_dss_avg_ms": 4474.979,
+        "sdtrustkit_avg_ms": 288.817,
+        "pyhanko_avg_ms": 52.504
+      },
+      {
+        "file": "signed_pdfs/sources/dss-more/CZ.pdf",
+        "bytes": 3851825,
+        "eu_dss_avg_ms": 2997.484,
+        "sdtrustkit_avg_ms": 314.379,
+        "pyhanko_avg_ms": 52.185
+      },
+      {
+        "file": "signed_pdfs/sources/dss/lt-short.pdf",
+        "bytes": 958559,
+        "eu_dss_avg_ms": 2619.056,
+        "sdtrustkit_avg_ms": 577.462,
+        "pyhanko_avg_ms": 183.823
+      },
+      {
+        "file": "signed_pdfs/diversity/dss__lt-short.pdf",
+        "bytes": 958559,
+        "eu_dss_avg_ms": 2319.888,
+        "sdtrustkit_avg_ms": 568.053,
+        "pyhanko_avg_ms": 190.849
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/lt-short.pdf",
+        "bytes": 958559,
+        "eu_dss_avg_ms": 2301.059,
+        "sdtrustkit_avg_ms": 578.745,
+        "pyhanko_avg_ms": 189.37
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/adbe_crl_signed.pdf",
+        "bytes": 1827014,
+        "eu_dss_avg_ms": 1703.772,
+        "sdtrustkit_avg_ms": 101.889,
+        "pyhanko_avg_ms": 174.189
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/PAdES-LTA.pdf",
+        "bytes": 4261525,
+        "eu_dss_avg_ms": 1629.72,
+        "sdtrustkit_avg_ms": 75.496,
+        "pyhanko_avg_ms": 11.582
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2024_154.pdf",
+        "bytes": 8342527,
+        "eu_dss_avg_ms": 1398.691,
+        "sdtrustkit_avg_ms": 2472.333,
+        "pyhanko_avg_ms": 882.102
+      }
+    ],
+    "pyhanko": [
+      {
+        "file": "signed_pdfs/diversity/dss__51sigs.pdf",
+        "bytes": 4635107,
+        "pyhanko_avg_ms": 5413.815,
+        "sdtrustkit_avg_ms": 4158.638,
+        "eu_dss_avg_ms": 21358.486
+      },
+      {
+        "file": "signed_pdfs/sources/dss/51sigs.pdf",
+        "bytes": 4635107,
+        "pyhanko_avg_ms": 5230.434,
+        "sdtrustkit_avg_ms": 4174.67,
+        "eu_dss_avg_ms": 23744.62
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/51sigs.pdf",
+        "bytes": 4635107,
+        "pyhanko_avg_ms": 5148.376,
+        "sdtrustkit_avg_ms": 4232.432,
+        "eu_dss_avg_ms": 23584.99
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_100.pdf",
+        "bytes": 38455672,
+        "pyhanko_avg_ms": 4317.203,
+        "sdtrustkit_avg_ms": 2022.726,
+        "eu_dss_avg_ms": 1250.26
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2024_210.pdf",
+        "bytes": 17387616,
+        "pyhanko_avg_ms": 3147.027,
+        "sdtrustkit_avg_ms": 1181.831,
+        "eu_dss_avg_ms": 718.8
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_363.pdf",
+        "bytes": 26877577,
+        "pyhanko_avg_ms": 3117.704,
+        "sdtrustkit_avg_ms": 1566.534,
+        "eu_dss_avg_ms": 873.5
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2024_435.pdf",
+        "bytes": 15600665,
+        "pyhanko_avg_ms": 2324.896,
+        "sdtrustkit_avg_ms": 925.324,
+        "eu_dss_avg_ms": 575.723
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_230.pdf",
+        "bytes": 7625251,
+        "pyhanko_avg_ms": 2080.313,
+        "sdtrustkit_avg_ms": 650.933,
+        "eu_dss_avg_ms": 489.285
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2024_153.pdf",
+        "bytes": 20179174,
+        "pyhanko_avg_ms": 2022.076,
+        "sdtrustkit_avg_ms": 514.724,
+        "eu_dss_avg_ms": 728.858
+      },
+      {
+        "file": "signed_pdfs/sources/gov-sk/ZZ_2025_236.pdf",
+        "bytes": 2226092,
+        "pyhanko_avg_ms": 1183.613,
+        "sdtrustkit_avg_ms": 15524.742,
+        "eu_dss_avg_ms": 4700.633
+      },
+      {
+        "file": "signed_pdfs/diversity/digidoc4j__PadesProfileT.pdf",
+        "bytes": 3324067,
+        "pyhanko_avg_ms": 1166.7,
+        "sdtrustkit_avg_ms": 151.154,
+        "eu_dss_avg_ms": 210.95
+      },
+      {
+        "file": "signed_pdfs/sources/digidoc4j/PadesProfileLtWithCrl.pdf",
+        "bytes": 6725910,
+        "pyhanko_avg_ms": 1150.504,
+        "sdtrustkit_avg_ms": 213.246,
+        "eu_dss_avg_ms": 1011.954
+      }
+    ],
+    "eu_dss_over_sdtrustkit": [
+      {
+        "file": "signed_pdfs/sources/gov-pl-mp/MP2026_267.pdf",
+        "bytes": 233692,
+        "eu_dss_over_sdtrustkit": 456.367,
+        "sdtrustkit_avg_ms": 1.976,
+        "eu_dss_avg_ms": 901.782,
+        "pyhanko_avg_ms": 5.157
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/dss-2236__hide.pdf",
+        "bytes": 34917,
+        "eu_dss_over_sdtrustkit": 306.341,
+        "sdtrustkit_avg_ms": 0.95,
+        "eu_dss_avg_ms": 291.024,
+        "pyhanko_avg_ms": 3.99
+      },
+      {
+        "file": "signed_pdfs/sources/dss/dss-2236__hide.pdf",
+        "bytes": 34917,
+        "eu_dss_over_sdtrustkit": 288.852,
+        "sdtrustkit_avg_ms": 0.926,
+        "eu_dss_avg_ms": 267.477,
+        "pyhanko_avg_ms": 3.682
+      },
+      {
+        "file": "signed_pdfs/diversity/dss__dss-2236__hide.pdf",
+        "bytes": 34917,
+        "eu_dss_over_sdtrustkit": 261.652,
+        "sdtrustkit_avg_ms": 0.928,
+        "eu_dss_avg_ms": 242.813,
+        "pyhanko_avg_ms": 11.736
+      },
+      {
+        "file": "signed_pdfs/sources/gov-pl-mp/MP2026_246.pdf",
+        "bytes": 193681,
+        "eu_dss_over_sdtrustkit": 196.863,
+        "sdtrustkit_avg_ms": 1.711,
+        "eu_dss_avg_ms": 336.832,
+        "pyhanko_avg_ms": 4.575
+      },
+      {
+        "file": "signed_pdfs/sources/gov-pl-mp/MP2026_354.pdf",
+        "bytes": 186012,
+        "eu_dss_over_sdtrustkit": 179.74,
+        "sdtrustkit_avg_ms": 1.621,
+        "eu_dss_avg_ms": 291.359,
+        "pyhanko_avg_ms": 4.881
+      },
+      {
+        "file": "signed_pdfs/sources/gov-pl-mp/MP2026_353.pdf",
+        "bytes": 174676,
+        "eu_dss_over_sdtrustkit": 173.445,
+        "sdtrustkit_avg_ms": 1.54,
+        "eu_dss_avg_ms": 267.105,
+        "pyhanko_avg_ms": 4.595
+      },
+      {
+        "file": "signed_pdfs/diversity/dss__evidence-record__Signature-P-B-7da49953-d837-4f0b-8f38-aa5aa4181e3c.pdf",
+        "bytes": 254226,
+        "eu_dss_over_sdtrustkit": 172.017,
+        "sdtrustkit_avg_ms": 2.236,
+        "eu_dss_avg_ms": 384.631,
+        "pyhanko_avg_ms": 16.842
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/evidence-record__Signature-P-B-7da49953-d837-4f0b-8f38-aa5aa4181e3c.pdf",
+        "bytes": 254226,
+        "eu_dss_over_sdtrustkit": 170.042,
+        "sdtrustkit_avg_ms": 2.254,
+        "eu_dss_avg_ms": 383.274,
+        "pyhanko_avg_ms": 16.746
+      },
+      {
+        "file": "signed_pdfs/sources/dss/evidence-record__Signature-P-B-7da49953-d837-4f0b-8f38-aa5aa4181e3c.pdf",
+        "bytes": 254226,
+        "eu_dss_over_sdtrustkit": 153.313,
+        "sdtrustkit_avg_ms": 2.216,
+        "eu_dss_avg_ms": 339.741,
+        "pyhanko_avg_ms": 16.614
+      },
+      {
+        "file": "signed_pdfs/sources/gov-pl-mp/MP2026_337.pdf",
+        "bytes": 177502,
+        "eu_dss_over_sdtrustkit": 138.54,
+        "sdtrustkit_avg_ms": 1.562,
+        "eu_dss_avg_ms": 216.399,
+        "pyhanko_avg_ms": 4.287
+      },
+      {
+        "file": "signed_pdfs/sources/gov-pl-mp/MP2026_261.pdf",
+        "bytes": 177625,
+        "eu_dss_over_sdtrustkit": 134.013,
+        "sdtrustkit_avg_ms": 1.6,
+        "eu_dss_avg_ms": 214.421,
+        "pyhanko_avg_ms": 4.275
+      }
+    ],
+    "pyhanko_over_sdtrustkit": [
+      {
+        "file": "signed_pdfs/test/sources/pyhanko/coverage-anomalies__signature-gap-too-big.pdf",
+        "bytes": 7486,
+        "pyhanko_over_sdtrustkit": 37.3,
+        "sdtrustkit_avg_ms": 0.14,
+        "eu_dss_avg_ms": 3.542,
+        "pyhanko_avg_ms": 5.222
+      },
+      {
+        "file": "signed_pdfs/sources/pyhanko/coverage-anomalies__signature-gap-too-big.pdf",
+        "bytes": 7486,
+        "pyhanko_over_sdtrustkit": 36.161,
+        "sdtrustkit_avg_ms": 0.137,
+        "eu_dss_avg_ms": 3.231,
+        "pyhanko_avg_ms": 4.954
+      },
+      {
+        "file": "pdf-generator/output/20260523-184631/byterange-overlap.pdf",
+        "bytes": 12049,
+        "pyhanko_over_sdtrustkit": 36.087,
+        "sdtrustkit_avg_ms": 0.23,
+        "eu_dss_avg_ms": 13.448,
+        "pyhanko_avg_ms": 8.3
+      },
+      {
+        "file": "signed_pdfs/diversity/pyhanko__coverage-anomalies__signature-gap-too-big.pdf",
+        "bytes": 7486,
+        "pyhanko_over_sdtrustkit": 33.979,
+        "sdtrustkit_avg_ms": 0.142,
+        "eu_dss_avg_ms": 6.579,
+        "pyhanko_avg_ms": 4.825
+      },
+      {
+        "file": "signed_pdfs/test/sources/node-signpdf/with-placeholder.pdf",
+        "bytes": 18233,
+        "pyhanko_over_sdtrustkit": 32.821,
+        "sdtrustkit_avg_ms": 0.207,
+        "eu_dss_avg_ms": 0.86,
+        "pyhanko_avg_ms": 6.794
+      },
+      {
+        "file": "signed_pdfs/diversity/node-signpdf__with-placeholder.pdf",
+        "bytes": 18233,
+        "pyhanko_over_sdtrustkit": 32.812,
+        "sdtrustkit_avg_ms": 0.213,
+        "eu_dss_avg_ms": 2.344,
+        "pyhanko_avg_ms": 6.989
+      },
+      {
+        "file": "pdf-generator/output/20260523-184630/message-digest-mismatch.pdf",
+        "bytes": 9467,
+        "pyhanko_over_sdtrustkit": 31.713,
+        "sdtrustkit_avg_ms": 0.171,
+        "eu_dss_avg_ms": 19.732,
+        "pyhanko_avg_ms": 5.423
+      },
+      {
+        "file": "pdf-generator/output/20260523-190456/byterange-overlap.pdf",
+        "bytes": 12664,
+        "pyhanko_over_sdtrustkit": 31.56,
+        "sdtrustkit_avg_ms": 0.182,
+        "eu_dss_avg_ms": 17.331,
+        "pyhanko_avg_ms": 5.744
+      },
+      {
+        "file": "pdf-generator/output/20260523-184625/byterange-overlap.pdf",
+        "bytes": 11428,
+        "pyhanko_over_sdtrustkit": 31.302,
+        "sdtrustkit_avg_ms": 0.222,
+        "eu_dss_avg_ms": 17.077,
+        "pyhanko_avg_ms": 6.949
+      },
+      {
+        "file": "signed_pdfs/test/sources/dss/pades-signed-filled-form.pdf",
+        "bytes": 816513,
+        "pyhanko_over_sdtrustkit": 31.25,
+        "sdtrustkit_avg_ms": 23.255,
+        "eu_dss_avg_ms": 97.049,
+        "pyhanko_avg_ms": 726.714
+      },
+      {
+        "file": "signed_pdfs/sources/node-signpdf/with-placeholder.pdf",
+        "bytes": 18233,
+        "pyhanko_over_sdtrustkit": 31.209,
+        "sdtrustkit_avg_ms": 0.215,
+        "eu_dss_avg_ms": 1.041,
+        "pyhanko_avg_ms": 6.71
+      },
+      {
+        "file": "signed_pdfs/sources/dss/pades-signed-filled-form.pdf",
+        "bytes": 816513,
+        "pyhanko_over_sdtrustkit": 31.104,
+        "sdtrustkit_avg_ms": 23.813,
+        "eu_dss_avg_ms": 152.706,
+        "pyhanko_avg_ms": 740.672
+      }
+    ]
+  },
+  "notes": [
+    "This is an offline benchmark, not a conformance certification.",
+    "The corpus intentionally mixes public PDFs, EU DSS fixtures, synthetic malformed cases, unsigned inputs, and stress files.",
+    "Many inconclusive results are expected because the run disables network fetching and does not load a full public trust store.",
+    "pyHanko reports errors for a number of hybrid-reference/diff-policy cases under this strict offline configuration; those rows are counted separately instead of being coerced to invalid.",
+    "EU DSS timing data was taken from the corrected SimpleReport-based offline rerun; SDTrustKit and pyHanko timing tables were regenerated for this report."
+  ]
+}

@@ -369,9 +369,7 @@ fn normalize_signer_identifier_resolution_deltas(cases: &mut [CaseSnapshot]) {
     for case in cases {
         let signer_name = match case.file.as_str() {
             "0143.pdf" | "0154.pdf" => "Lord Testerino",
-            "0146.pdf" | "0149.pdf" | "0150.pdf" | "0151.pdf" | "0152.pdf" | "0157.pdf" => {
-                "Alice"
-            }
+            "0146.pdf" | "0149.pdf" | "0150.pdf" | "0151.pdf" | "0152.pdf" | "0157.pdf" => "Alice",
             _ => continue,
         };
 
