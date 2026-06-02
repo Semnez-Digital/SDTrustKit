@@ -16,10 +16,36 @@ Current version: `1.0.1`
 | Package | Path | Purpose |
 | --- | --- | --- |
 | Rust core | `rust/sd_trust_kit` | Validation engine, C ABI, optional Android JNI exports, and `sd-trust-validate` CLI |
-| Swift package | `swift/SDTrustKit` | SwiftPM wrapper backed by `CSDTrustKit.xcframework` |
+| Swift package | `Package.swift` | Root SwiftPM package backed by `swift/SDTrustKit/Frameworks/CSDTrustKit.xcframework` |
 | Android package | `kotlin/SDTrustKit` | Kotlin Android library module backed by JNI |
 | Docs | `docs` | Migration notes, XCFramework distribution notes, and fixture analysis |
 | Corpus reports | `validation-corpus/performance-reports` | Offline benchmark artifacts for SDTrustKit, EU DSS, and pyHanko |
+
+## Install With Xcode
+
+SDTrustKit is distributed as a Swift Package through Git tags. In Xcode, choose
+**File > Add Package Dependencies...** and use:
+
+```text
+https://github.com/Semnez-Digital/SDTrustKit.git
+```
+
+Recommended dependency rule:
+
+```text
+Up to Next Major Version: 1.0.1
+```
+
+Then add the `SDTrustKit` product to your app target and import it from Swift:
+
+```swift
+import SDTrustKit
+```
+
+Future updates are published by pushing the next semver tag.
+In Xcode, use **File > Packages > Update to Latest Package Versions** to move to
+the newest compatible `1.x` release, or edit the package requirement if you want
+to pin an exact version.
 
 ## Validation Scope
 
@@ -139,15 +165,6 @@ If option JSON cannot be decoded, the ABI returns:
 
 The Swift package supports iOS 15+ and macOS 13+. It links the bundled
 `CSDTrustKit.xcframework` internally, so app targets import only `SDTrustKit`.
-
-Add the package in Xcode with the repository URL:
-
-```text
-https://github.com/Semnez-Digital/SDTrustKit.git
-```
-
-Use the latest `1.x` version, or pin to a specific release tag such as
-`1.0.1`.
 
 ```swift
 import SDTrustKit
