@@ -140,6 +140,15 @@ If option JSON cannot be decoded, the ABI returns:
 The Swift package supports iOS 15+ and macOS 13+. It links the bundled
 `CSDTrustKit.xcframework` internally, so app targets import only `SDTrustKit`.
 
+Add the package in Xcode with the repository URL:
+
+```text
+https://github.com/Semnez-Digital/SDTrustKit.git
+```
+
+Use the latest `1.x` version, or pin to a specific release tag such as
+`1.0.1`.
+
 ```swift
 import SDTrustKit
 
