@@ -1,3 +1,5 @@
+#[cfg(feature = "android-jni")]
+mod android_jni;
 mod asn1;
 mod cms;
 mod crypto;
@@ -197,11 +199,25 @@ pub fn verify_pdf_with_options(pdf: &[u8], options: &VerificationOptions) -> Val
 fn usable_signature_dictionaries(pdf: &[u8]) -> (Vec<SigDict>, usize) {
     let parsed = SigDict::parse_all(pdf);
     let mut ignored_bad_cms_count = 0usize;
+    let has_field_resolved_signature = parsed
+        .iter()
+        .any(|sig| pdf::signature_dictionary_has_field_reference(pdf, sig));
+    let candidate_count_before_orphan_filter = parsed
+        .iter()
+        .filter(|sig| {
+            !sig.is_usage_rights_signature()
+                && !pdf::signature_field_tree_has_self_reference(pdf, sig)
+                && !is_bad_encoded_cms_signature(sig)
+        })
+        .count();
     let sigs = parsed
         .into_iter()
         .filter(|sig| {
             if sig.is_usage_rights_signature()
                 || pdf::signature_field_tree_has_self_reference(pdf, sig)
+                || (has_field_resolved_signature
+                    && candidate_count_before_orphan_filter > 1
+                    && pdf::signature_dictionary_is_unreferenced_orphan(pdf, sig))
             {
                 false
             } else if is_bad_encoded_cms_signature(sig) {
@@ -1279,6 +1295,35 @@ mod tests {
             signature_revocation_time_unix_seconds(&report, 1_779_530_582.0),
             1_779_667_200.0
         );
+    }
+
+    #[test]
+    fn signature_selection_ignores_in_file_orphan_signature_dictionary() {
+        let pdf = br#"%PDF-1.7
+1 0 obj
+<< /Type /Catalog /AcroForm 2 0 R >>
+endobj
+2 0 obj
+<< /Fields [3 0 R] >>
+endobj
+3 0 obj
+<< /FT /Sig /V 8 0 R >>
+endobj
+8 0 obj
+<< /Type /Sig /Filter /Adobe.PPKLite /SubFilter /adbe.pkcs7.detached
+   /ByteRange [0 0 0 0] /Contents <3000> >>
+endobj
+9 0 obj
+<< /Type /Sig /Filter /Adobe.PPKLite /SubFilter /adbe.pkcs7.detached
+   /ByteRange [0 1 2 3] /Contents <3000> >>
+endobj
+%%EOF"#;
+
+        let (sigs, ignored_bad_cms_count) = usable_signature_dictionaries(pdf);
+
+        assert_eq!(ignored_bad_cms_count, 0);
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].object_number, Some(8));
     }
 
     fn test_signature_report(

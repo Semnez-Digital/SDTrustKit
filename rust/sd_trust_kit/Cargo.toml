@@ -1,6 +1,6 @@
 [package]
 name = "sd_trust_kit"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["Backup Experts SRL"]
 license = "LGPL-2.1-or-later"
@@ -15,12 +15,17 @@ crate-type = ["rlib", "staticlib", "cdylib"]
 name = "sd-trust-validate"
 path = "src/main.rs"
 
+[features]
+default = []
+android-jni = ["dep:jni"]
+
 [dependencies]
 base64 = "0.22"
 bp256 = { version = "0.14.0-rc.8", features = ["arithmetic", "ecdsa"] }
 ecdsa17 = { package = "ecdsa", version = "0.17.0-rc.18", default-features = false, features = ["algorithm", "der", "hazmat"] }
 flate2 = "1"
 hex = "0.4"
+jni = { version = "0.21", optional = true }
 md-5 = "0.10"
 p256 = { version = "0.13", features = ["ecdsa"] }
 p384 = { version = "0.13", features = ["ecdsa"] }

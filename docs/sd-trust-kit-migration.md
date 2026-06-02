@@ -1,8 +1,9 @@
 # SDTrustKit Migration Notes
 
-Current release: `1.0.0`.
+Current release: `1.0.1`.
 
-`1.0.0` is the first public release line. `ValidationReport` and document
+`1.0.1` includes signer-validity hardening and PDF parser guardrails.
+`ValidationReport` and document
 `SignatureReport` include `padesLevel` and `preservation` fields in the Rust
 JSON and Swift DTOs.
 

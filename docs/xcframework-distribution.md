@@ -2,12 +2,13 @@
 
 SDTrustKit ships a Swift package backed by a static Rust XCFramework:
 
-- Current version: `1.0.0`
+- Current version: `1.0.1`
 - Swift target: `SDTrustKit`
 - C binary target: `CSDTrustKit`
 - Artifact path: `swift/SDTrustKit/Frameworks/CSDTrustKit.xcframework`
 
-`1.0.0` is the first public release line. `ValidationReport` and document
+`1.0.1` includes signer-validity hardening and PDF parser guardrails.
+`ValidationReport` and document
 `SignatureReport` include `padesLevel` and `preservation` fields so apps can
 show PAdES preservation labels separately from the validation verdict.
 
@@ -84,7 +85,7 @@ engine changes underneath it.
 Use this prompt when wiring SDTrustKit into CEISign:
 
 ```text
-You are working in the CEISign app. Integrate SDTrustKit 1.0.0 with the smallest
+You are working in the CEISign app. Integrate SDTrustKit 1.0.1 with the smallest
 possible app-facing change.
 
 Context:

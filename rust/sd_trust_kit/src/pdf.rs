@@ -373,6 +373,43 @@ pub fn signature_field_tree_has_self_reference(pdf: &[u8], sig: &SigDict) -> boo
         })
 }
 
+pub fn signature_dictionary_is_unreferenced_orphan(pdf: &[u8], sig: &SigDict) -> bool {
+    let Some(signature_id) = sig.object_id() else {
+        return false;
+    };
+    let final_fields = acroform_signature_fields(pdf);
+    let signed_revision_size = sig.signed_revision_size();
+    let signed_fields = if signed_revision_size <= pdf.len() {
+        acroform_signature_fields(&pdf[..signed_revision_size])
+    } else {
+        Vec::new()
+    };
+    let has_field_model = !final_fields.is_empty() || !signed_fields.is_empty();
+    has_field_model
+        && sig.object_start >= signed_revision_size
+        && !final_fields
+            .iter()
+            .chain(signed_fields.iter())
+            .any(|field| field.value == Some(signature_id))
+}
+
+pub fn signature_dictionary_has_field_reference(pdf: &[u8], sig: &SigDict) -> bool {
+    let Some(signature_id) = sig.object_id() else {
+        return false;
+    };
+    let final_fields = acroform_signature_fields(pdf);
+    let signed_revision_size = sig.signed_revision_size();
+    let signed_fields = if signed_revision_size <= pdf.len() {
+        acroform_signature_fields(&pdf[..signed_revision_size])
+    } else {
+        Vec::new()
+    };
+    final_fields
+        .iter()
+        .chain(signed_fields.iter())
+        .any(|field| field.value == Some(signature_id))
+}
+
 pub fn signature_has_shadow_copy_after_signed_revision(pdf: &[u8], sig: &SigDict) -> bool {
     let Some(signature_id) = sig.object_id() else {
         return false;
@@ -431,16 +468,8 @@ fn parse_one(bytes: &[u8], br_range: Range<usize>) -> Option<SigDict> {
         while i < bytes.len() && is_whitespace(bytes[i]) {
             i += 1;
         }
-        let mut n = 0usize;
-        let mut any = false;
-        while i < bytes.len() && is_digit(bytes[i]) {
-            n = n * 10 + usize::from(bytes[i] - b'0');
-            i += 1;
-            any = true;
-        }
-        if !any {
-            return None;
-        }
+        let (n, next) = parse_usize_digits(bytes, i)?;
+        i = next;
         nums.push(n);
     }
 
@@ -521,14 +550,22 @@ fn direct_length_before_stream(bytes: &[u8], stream_start: usize) -> Option<usiz
     while i < stream_start && is_whitespace(bytes[i]) {
         i += 1;
     }
+    let (value, _) = parse_usize_digits(&bytes[..stream_start], i)?;
+    Some(value)
+}
+
+fn parse_usize_digits(bytes: &[u8], start: usize) -> Option<(usize, usize)> {
+    let mut i = start;
     let mut value = 0usize;
     let mut any = false;
-    while i < stream_start && is_digit(bytes[i]) {
-        value = value * 10 + usize::from(bytes[i] - b'0');
+    while i < bytes.len() && is_digit(bytes[i]) {
+        value = value
+            .checked_mul(10)?
+            .checked_add(usize::from(bytes[i] - b'0'))?;
         i += 1;
         any = true;
     }
-    any.then_some(value)
+    any.then_some((value, i))
 }
 
 fn is_inside_stream(bytes: &[u8], index: usize) -> bool {
@@ -1964,6 +2001,19 @@ endobj
             }
         )
         .is_empty());
+    }
+
+    #[test]
+    fn oversized_byte_range_integer_is_rejected_without_overflow() {
+        let pdf = br#"%PDF-1.7
+1 0 obj
+<< /Type /Sig /Filter /Adobe.PPKLite /SubFilter /adbe.pkcs7.detached
+   /ByteRange [0 999999999999999999999999999999999999999 0 0]
+   /Contents <3000> >>
+endobj
+%%EOF"#;
+
+        assert!(SigDict::parse_all(pdf).is_empty());
     }
 
     fn test_sig_dict(object_number: usize, signed_revision_size: usize) -> SigDict {
