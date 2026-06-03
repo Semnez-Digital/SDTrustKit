@@ -9,7 +9,7 @@ certificate pinning, EU trusted-list refresh, CRL/OCSP refresh, and product UI.
 SDTrustKit performs deterministic local validation against the PDF bytes and the
 trust/revocation material supplied by the caller.
 
-Current version: `1.0.2`
+Current version: `1.0.3`
 
 ## Packages
 
@@ -33,7 +33,7 @@ https://github.com/Semnez-Digital/SDTrustKit.git
 Recommended dependency rule:
 
 ```text
-Up to Next Major Version: 1.0.2
+Up to Next Major Version: 1.0.3
 ```
 
 Then add the `SDTrustKit` product to your app target and import it from Swift:

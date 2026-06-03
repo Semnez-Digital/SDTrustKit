@@ -894,7 +894,7 @@ dependencies = [
 
 [[package]]
 name = "sd_trust_kit"
-version = "1.0.2"
+version = "1.0.3"
 dependencies = [
  "base64",
  "bp256",
