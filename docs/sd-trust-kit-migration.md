@@ -1,8 +1,8 @@
 # SDTrustKit Migration Notes
 
-Current release: `1.0.1`.
+Current release: `1.0.2`.
 
-`1.0.1` includes signer-validity hardening and PDF parser guardrails.
+`1.0.2` includes signer-chain validity hardening and PDF timestamp parser guardrails.
 `ValidationReport` and document
 `SignatureReport` include `padesLevel` and `preservation` fields in the Rust
 JSON and Swift DTOs.

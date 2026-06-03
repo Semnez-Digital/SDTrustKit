@@ -4,9 +4,9 @@ Portable Rust validation core for PAdES/PDF signature verification. The Swift
 and Kotlin packages wrap this crate for app integration while keeping validation
 behavior shared across platforms.
 
-Current version: `1.0.1`.
+Current version: `1.0.2`.
 
-`1.0.1` includes signer-validity hardening, PDF parser guardrails, and the
+`1.0.2` includes signer-chain validity hardening, PDF timestamp parser guardrails, and the
 optional Android JNI bridge. Serialized reports include `padesLevel` and
 `preservation` fields on the top-level `ValidationReport` and each document
 `SignatureReport`.

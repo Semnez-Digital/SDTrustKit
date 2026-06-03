@@ -1,6 +1,6 @@
 [package]
 name = "sd_trust_kit"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 authors = ["Backup Experts SRL"]
 license = "LGPL-2.1-or-later"

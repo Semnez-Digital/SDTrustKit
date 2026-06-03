@@ -4,9 +4,9 @@ Swift Package Manager wrapper for the SDTrustKit Rust PDF validation core. The
 Swift layer owns option encoding, FFI memory handling, and report decoding while
 validation runs inside the bundled `CSDTrustKit.xcframework`.
 
-Current version: `1.0.1`.
+Current version: `1.0.2`.
 
-`1.0.1` includes signer-validity hardening and PDF parser guardrails.
+`1.0.2` includes signer-chain validity hardening and PDF timestamp parser guardrails.
 `ValidationReport` and `SignatureReport` include `padesLevel` and
 `preservation` fields.
 

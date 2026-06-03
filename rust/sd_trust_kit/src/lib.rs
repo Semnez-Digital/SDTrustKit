@@ -698,11 +698,17 @@ fn verify_signature(
         &options.signer_trust_anchor_sets,
         claimed_signing_time,
     );
-    let signer_chain_validation_time = if options.signer_trust_anchor_sets.is_empty() {
-        None
-    } else {
-        claimed_signing_time
-    };
+    let (signer_leaf_validation_time, signer_issuer_validation_time) =
+        if options.signer_trust_anchor_sets.is_empty() {
+            let issuer_validation_time = if sig_ok {
+                Some(current_unix_seconds())
+            } else {
+                claimed_signing_time
+            };
+            (None, issuer_validation_time)
+        } else {
+            (claimed_signing_time, claimed_signing_time)
+        };
     let trusted_chain = if !options.signer_trust_anchor_sets.is_empty() {
         let preferred_signer_trust_anchors =
             trust_anchors_for_time(&[], &options.signer_trust_anchor_sets, claimed_signing_time);
@@ -711,14 +717,16 @@ fn verify_signature(
             &intermediates,
             &signer_trust_anchors,
             &preferred_signer_trust_anchors,
-            signer_chain_validation_time,
+            signer_leaf_validation_time,
+            signer_issuer_validation_time,
         )
     } else {
         trust::trusted_chain_to_anchor_at_time(
             &signer_cert_der,
             &intermediates,
             &signer_trust_anchors,
-            signer_chain_validation_time,
+            signer_leaf_validation_time,
+            signer_issuer_validation_time,
         )
     };
     let signer_chain_trusted = trusted_chain.is_some();

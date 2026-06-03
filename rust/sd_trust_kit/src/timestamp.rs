@@ -137,6 +137,7 @@ pub fn verify_signature_timestamp(
             &intermediates,
             &timestamp_trust_anchors,
             validation_time,
+            validation_time,
         );
         let trusted_pin_chain = || {
             trust::trusted_chain_to_certificate_sha256_pin(
@@ -368,6 +369,7 @@ where
             &leaf_cert,
             &intermediates,
             &timestamp_trust_anchors,
+            validation_time,
             validation_time,
         );
         let trusted_pin_chain = || {

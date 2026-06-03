@@ -990,45 +990,40 @@ fn parse_pdf_name_after(
     (i > start).then(|| String::from_utf8_lossy(&bytes[start..i]).to_string())
 }
 
-fn find_pdf_name(
+fn find_direct_pdf_dictionary_name(
     bytes: &[u8],
     name: &[u8],
     object_start: usize,
     object_end: usize,
 ) -> Option<Range<usize>> {
     let limit = object_end.min(bytes.len());
-    let mut i = object_start;
-    while i < limit {
-        match bytes[i] {
-            b'%' => {
-                while i < limit && bytes[i] != b'\n' && bytes[i] != b'\r' {
-                    i += 1;
-                }
-            }
-            b'(' => {
-                i = parse_literal_string(bytes, i)?.1;
-            }
-            b'<' if bytes.get(i + 1) == Some(&b'<') => {
-                i += 2;
-            }
-            b'<' => {
-                i = parse_hex_string(bytes, i)?.1;
-            }
-            b'/' => {
-                let name_start = i + 1;
-                let mut name_end = name_start;
-                while name_end < limit && is_pdf_name_byte(bytes[name_end]) {
-                    name_end += 1;
-                }
-                if pdf_name_token_matches(&bytes[name_start..name_end], name) {
-                    return Some(i..name_end);
-                }
-                i = name_end;
-            }
-            _ => i += 1,
-        }
+    let mut i = skip_whitespace_and_comments(bytes, object_start, limit);
+    while i + 1 < limit && (bytes[i] != b'<' || bytes[i + 1] != b'<') {
+        i += 1;
+        i = skip_whitespace_and_comments(bytes, i, limit);
     }
-    None
+    if i + 1 >= limit {
+        return None;
+    }
+    i += 2;
+    loop {
+        i = skip_whitespace_and_comments(bytes, i, limit);
+        if i + 1 < limit && bytes[i] == b'>' && bytes[i + 1] == b'>' {
+            return None;
+        }
+        if bytes.get(i) != Some(&b'/') {
+            return None;
+        }
+        let name_start = i + 1;
+        let mut name_end = name_start;
+        while name_end < limit && is_pdf_name_byte(bytes[name_end]) {
+            name_end += 1;
+        }
+        if pdf_name_token_matches(&bytes[name_start..name_end], name) {
+            return Some(i..name_end);
+        }
+        i = skip_pdf_object(bytes, name_end, limit)?;
+    }
 }
 
 fn pdf_name_token_matches(token: &[u8], expected: &[u8]) -> bool {
@@ -1063,7 +1058,7 @@ fn parse_modification_date(
     object_end: usize,
     signed_revision_size: usize,
 ) -> Option<String> {
-    let range = find_pdf_name(bytes, b"M", object_start, object_end)?;
+    let range = find_direct_pdf_dictionary_name(bytes, b"M", object_start, object_end)?;
     let mut i = range.end;
     while i < object_end && is_whitespace(bytes[i]) {
         i += 1;
@@ -1079,6 +1074,116 @@ fn parse_modification_date(
         return None;
     }
     decode_pdf_text_string(&literal)
+}
+
+fn skip_pdf_object(bytes: &[u8], start: usize, limit: usize) -> Option<usize> {
+    let i = skip_whitespace_and_comments(bytes, start, limit);
+    match bytes.get(i).copied()? {
+        b'(' => parse_literal_string(bytes, i).map(|(_, end)| end),
+        b'<' if bytes.get(i + 1) == Some(&b'<') => skip_pdf_dictionary(bytes, i, limit),
+        b'<' => parse_hex_string(bytes, i).map(|(_, end)| end),
+        b'[' => skip_pdf_array(bytes, i, limit),
+        b'/' => Some(skip_pdf_name(bytes, i + 1, limit)),
+        b'+' | b'-' | b'.' | b'0'..=b'9' => Some(skip_pdf_number_or_reference(bytes, i, limit)),
+        _ => Some(skip_pdf_regular_token(bytes, i, limit)),
+    }
+}
+
+fn skip_pdf_dictionary(bytes: &[u8], start: usize, limit: usize) -> Option<usize> {
+    if bytes.get(start) != Some(&b'<') || bytes.get(start + 1) != Some(&b'<') {
+        return None;
+    }
+    let mut i = start + 2;
+    loop {
+        i = skip_whitespace_and_comments(bytes, i, limit);
+        if i + 1 < limit && bytes[i] == b'>' && bytes[i + 1] == b'>' {
+            return Some(i + 2);
+        }
+        let next = skip_pdf_object(bytes, i, limit)?;
+        if next <= i {
+            return None;
+        }
+        i = next;
+    }
+}
+
+fn skip_pdf_array(bytes: &[u8], start: usize, limit: usize) -> Option<usize> {
+    if bytes.get(start) != Some(&b'[') {
+        return None;
+    }
+    let mut i = start + 1;
+    loop {
+        i = skip_whitespace_and_comments(bytes, i, limit);
+        if bytes.get(i) == Some(&b']') {
+            return Some(i + 1);
+        }
+        let next = skip_pdf_object(bytes, i, limit)?;
+        if next <= i {
+            return None;
+        }
+        i = next;
+    }
+}
+
+fn skip_pdf_number_or_reference(bytes: &[u8], start: usize, limit: usize) -> usize {
+    let first_end = skip_pdf_regular_token(bytes, start, limit);
+    let second_start = skip_whitespace_and_comments(bytes, first_end, limit);
+    let Some(second) = bytes.get(second_start).copied() else {
+        return first_end;
+    };
+    if !matches!(second, b'+' | b'-' | b'0'..=b'9') {
+        return first_end;
+    }
+    let second_end = skip_pdf_regular_token(bytes, second_start, limit);
+    let r_start = skip_whitespace_and_comments(bytes, second_end, limit);
+    if bytes.get(r_start) == Some(&b'R') && is_token_boundary(bytes, r_start + 1, limit) {
+        r_start + 1
+    } else {
+        first_end
+    }
+}
+
+fn skip_pdf_name(bytes: &[u8], start: usize, limit: usize) -> usize {
+    let mut i = start;
+    while i < limit && is_pdf_name_byte(bytes[i]) {
+        i += 1;
+    }
+    i
+}
+
+fn skip_pdf_regular_token(bytes: &[u8], start: usize, limit: usize) -> usize {
+    let mut i = start;
+    while i < limit && !is_pdf_token_delimiter(bytes[i]) {
+        i += 1;
+    }
+    i
+}
+
+fn skip_whitespace_and_comments(bytes: &[u8], mut i: usize, limit: usize) -> usize {
+    while i < limit {
+        if is_whitespace(bytes[i]) {
+            i += 1;
+        } else if bytes[i] == b'%' {
+            while i < limit && bytes[i] != b'\n' && bytes[i] != b'\r' {
+                i += 1;
+            }
+        } else {
+            break;
+        }
+    }
+    i
+}
+
+fn is_token_boundary(bytes: &[u8], i: usize, limit: usize) -> bool {
+    i >= limit || is_pdf_token_delimiter(bytes[i])
+}
+
+fn is_pdf_token_delimiter(byte: u8) -> bool {
+    is_whitespace(byte)
+        || matches!(
+            byte,
+            b'(' | b')' | b'<' | b'>' | b'[' | b']' | b'{' | b'}' | b'/' | b'%'
+        )
 }
 
 fn parse_indirect_string(
@@ -2190,6 +2295,17 @@ endobj
     #[test]
     fn modification_date_matches_exact_pdf_name_token() {
         let pdf = br#"<< /Type /Sig /Metadata (D:19990101000000Z) /M (D:20260603115804Z) >>"#;
+
+        assert_eq!(
+            parse_modification_date(pdf, 0, pdf.len(), pdf.len()),
+            Some("D:20260603115804Z".to_owned())
+        );
+    }
+
+    #[test]
+    fn modification_date_ignores_nested_dictionary_entries() {
+        let pdf =
+            br#"<< /Type /Sig /Reference [<< /M (D:19990101000000Z) >>] /M (D:20260603115804Z) >>"#;
 
         assert_eq!(
             parse_modification_date(pdf, 0, pdf.len(), pdf.len()),

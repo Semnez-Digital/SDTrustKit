@@ -37,14 +37,15 @@ pub fn trusted_chain_to_anchor(
     if anchors.iter().any(|anchor| anchor.as_slice() == leaf) {
         return Some(vec![leaf.to_vec()]);
     }
-    trusted_chain_to_anchor_at_time(leaf, intermediates, anchors, None)
+    trusted_chain_to_anchor_at_time(leaf, intermediates, anchors, None, None)
 }
 
 pub fn trusted_chain_to_anchor_at_time(
     leaf: &[u8],
     intermediates: &[Vec<u8>],
     anchors: &[Vec<u8>],
-    validation_time: Option<f64>,
+    leaf_validation_time: Option<f64>,
+    issuer_validation_time: Option<f64>,
 ) -> Option<Vec<Vec<u8>>> {
     if anchors.is_empty() {
         return None;
@@ -52,7 +53,14 @@ pub fn trusted_chain_to_anchor_at_time(
     if anchors.iter().any(|anchor| anchor.as_slice() == leaf) {
         return Some(vec![leaf.to_vec()]);
     }
-    manual_trusted_chain_to_anchor(leaf, intermediates, anchors, &[], validation_time)
+    manual_trusted_chain_to_anchor(
+        leaf,
+        intermediates,
+        anchors,
+        &[],
+        leaf_validation_time,
+        issuer_validation_time,
+    )
 }
 
 pub fn trusted_chain_to_anchor_with_preferred_anchors_at_time(
@@ -60,7 +68,8 @@ pub fn trusted_chain_to_anchor_with_preferred_anchors_at_time(
     intermediates: &[Vec<u8>],
     anchors: &[Vec<u8>],
     preferred_anchors: &[Vec<u8>],
-    validation_time: Option<f64>,
+    leaf_validation_time: Option<f64>,
+    issuer_validation_time: Option<f64>,
 ) -> Option<Vec<Vec<u8>>> {
     if anchors.is_empty() {
         return None;
@@ -73,7 +82,8 @@ pub fn trusted_chain_to_anchor_with_preferred_anchors_at_time(
         intermediates,
         anchors,
         preferred_anchors,
-        validation_time,
+        leaf_validation_time,
+        issuer_validation_time,
     )
 }
 
@@ -105,7 +115,8 @@ fn manual_trusted_chain_to_anchor(
     intermediates: &[Vec<u8>],
     anchors: &[Vec<u8>],
     preferred_anchors: &[Vec<u8>],
-    validation_time: Option<f64>,
+    leaf_validation_time: Option<f64>,
+    issuer_validation_time: Option<f64>,
 ) -> Option<Vec<Vec<u8>>> {
     let mut all = vec![leaf.to_vec()];
     all.extend(intermediates.iter().cloned());
@@ -141,8 +152,18 @@ fn manual_trusted_chain_to_anchor(
             });
         }
         let issuer = candidates.into_iter().find(|candidate| {
-            certificate_is_valid_at(&current, validation_time)
-                && certificate_is_valid_at(candidate, validation_time)
+            let current_validation_time = if chain.len() == 1 {
+                leaf_validation_time
+            } else {
+                issuer_validation_time
+            };
+            let candidate_validation_time = if anchor_set.contains(&candidate.der) {
+                None
+            } else {
+                issuer_validation_time
+            };
+            certificate_is_valid_at(&current, current_validation_time)
+                && certificate_is_valid_at(candidate, candidate_validation_time)
                 && certificate_can_delegate(candidate)
                 && verify_certificate_signature(&current, candidate)
         })?;
@@ -623,7 +644,13 @@ pub fn unique_certificates(certs: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
 
 #[cfg(test)]
 mod tests {
-    use super::{trusted_chain_to_anchor, trusted_chain_to_certificate_sha256_pin};
+    use super::{
+        trusted_chain_to_anchor, trusted_chain_to_anchor_at_time,
+        trusted_chain_to_certificate_sha256_pin,
+    };
+    use base64::Engine;
+    use std::fs;
+    use std::path::Path;
 
     const CALLER_SUPPLIED_CERT: &[u8] = include_bytes!(
         "../tests/fixtures/app_trust_anchors/aa53228264e1dd6adb08194fe4c931bd7fd1c54c59b26445409058a8846d4c24-sts-root-g2.der"
@@ -650,5 +677,58 @@ mod tests {
         .expect("leaf pin should be trusted");
 
         assert_eq!(chain, vec![CALLER_SUPPLIED_CERT.to_vec()]);
+    }
+
+    #[test]
+    fn caller_supplied_anchor_chain_checks_issuer_validity_when_requested() {
+        let pdf = fs::read(fixture_path("pdf_model_gaps/control-valid.pdf")).expect("read PDF");
+        let sig = crate::pdf::SigDict::parse_all(&pdf)
+            .into_iter()
+            .find(|sig| !sig.is_document_timestamp())
+            .expect("document signature");
+        let cms = crate::cms::Cms::parse(&sig.cms_bytes).expect("CMS");
+        let signer = cms.signer_infos.first().expect("signerInfo");
+        let signer_cert = cms.cert_for_signer(signer).expect("signer cert");
+        let intermediates = cms
+            .certificates
+            .iter()
+            .filter(|cert| **cert != signer_cert)
+            .cloned()
+            .collect::<Vec<_>>();
+        let anchors = vec![read_pem_der(fixture_path("pdf_model_gaps/root.cert.pem"))];
+
+        assert!(trusted_chain_to_anchor_at_time(
+            &signer_cert,
+            &intermediates,
+            &anchors,
+            None,
+            None
+        )
+        .is_some());
+        assert!(trusted_chain_to_anchor_at_time(
+            &signer_cert,
+            &intermediates,
+            &anchors,
+            None,
+            Some(4_102_444_800.0),
+        )
+        .is_none());
+    }
+
+    fn read_pem_der(path: impl AsRef<Path>) -> Vec<u8> {
+        let pem = fs::read_to_string(path).expect("read PEM");
+        let encoded: String = pem
+            .lines()
+            .filter(|line| !line.starts_with("-----"))
+            .collect();
+        base64::engine::general_purpose::STANDARD
+            .decode(encoded)
+            .expect("decode PEM")
+    }
+
+    fn fixture_path(relative: &str) -> std::path::PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures")
+            .join(relative)
     }
 }
