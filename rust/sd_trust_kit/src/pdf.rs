@@ -474,7 +474,9 @@ fn parse_one(bytes: &[u8], br_range: Range<usize>) -> Option<SigDict> {
     }
 
     let (object_start, object_end, object_id) = signature_object_bounds(bytes, br_range)?;
-    let modification_date = parse_modification_date(bytes, object_start, object_end);
+    let signed_revision_size = nums[2].saturating_add(nums[3]);
+    let modification_date =
+        parse_modification_date(bytes, object_start, object_end, signed_revision_size);
     let type_name = parse_pdf_name_after("/Type", bytes, object_start, object_end);
     let sub_filter = parse_pdf_name_after("/SubFilter", bytes, object_start, object_end);
     if !is_signature_dictionary_candidate(type_name.as_deref(), sub_filter.as_deref()) {
@@ -988,21 +990,182 @@ fn parse_pdf_name_after(
     (i > start).then(|| String::from_utf8_lossy(&bytes[start..i]).to_string())
 }
 
-fn parse_modification_date(bytes: &[u8], object_start: usize, object_end: usize) -> Option<String> {
-    let range = first_range(b"/M", bytes, object_start, Some(object_end))?;
+fn find_pdf_name(
+    bytes: &[u8],
+    name: &[u8],
+    object_start: usize,
+    object_end: usize,
+) -> Option<Range<usize>> {
+    let limit = object_end.min(bytes.len());
+    let mut i = object_start;
+    while i < limit {
+        match bytes[i] {
+            b'%' => {
+                while i < limit && bytes[i] != b'\n' && bytes[i] != b'\r' {
+                    i += 1;
+                }
+            }
+            b'(' => {
+                i = parse_literal_string(bytes, i)?.1;
+            }
+            b'<' if bytes.get(i + 1) == Some(&b'<') => {
+                i += 2;
+            }
+            b'<' => {
+                i = parse_hex_string(bytes, i)?.1;
+            }
+            b'/' => {
+                let name_start = i + 1;
+                let mut name_end = name_start;
+                while name_end < limit && is_pdf_name_byte(bytes[name_end]) {
+                    name_end += 1;
+                }
+                if pdf_name_token_matches(&bytes[name_start..name_end], name) {
+                    return Some(i..name_end);
+                }
+                i = name_end;
+            }
+            _ => i += 1,
+        }
+    }
+    None
+}
+
+fn pdf_name_token_matches(token: &[u8], expected: &[u8]) -> bool {
+    let mut decoded = Vec::with_capacity(token.len());
+    let mut i = 0usize;
+    while i < token.len() {
+        if token[i] == b'#' && i + 2 < token.len() {
+            if let (Some(high), Some(low)) = (hex_nibble(token[i + 1]), hex_nibble(token[i + 2])) {
+                decoded.push((high << 4) | low);
+                i += 3;
+                continue;
+            }
+        }
+        decoded.push(token[i]);
+        i += 1;
+    }
+    decoded == expected
+}
+
+fn hex_nibble(byte: u8) -> Option<u8> {
+    match byte {
+        b'0'..=b'9' => Some(byte - b'0'),
+        b'a'..=b'f' => Some(byte - b'a' + 10),
+        b'A'..=b'F' => Some(byte - b'A' + 10),
+        _ => None,
+    }
+}
+
+fn parse_modification_date(
+    bytes: &[u8],
+    object_start: usize,
+    object_end: usize,
+    signed_revision_size: usize,
+) -> Option<String> {
+    let range = find_pdf_name(bytes, b"M", object_start, object_end)?;
     let mut i = range.end;
     while i < object_end && is_whitespace(bytes[i]) {
         i += 1;
     }
+    let object_limit = signed_revision_size.min(bytes.len());
     let (literal, end) = match bytes.get(i) {
         Some(b'(') => parse_literal_string(bytes, i)?,
         Some(b'<') => parse_hex_string(bytes, i)?,
+        Some(b'0'..=b'9') => parse_indirect_string(bytes, i, object_limit)?,
         _ => return None,
     };
     if end > object_end {
         return None;
     }
-    String::from_utf8(literal).ok()
+    decode_pdf_text_string(&literal)
+}
+
+fn parse_indirect_string(
+    bytes: &[u8],
+    start: usize,
+    object_limit: usize,
+) -> Option<(Vec<u8>, usize)> {
+    let (number, mut i) = parse_usize_digits(bytes, start)?;
+    while i < bytes.len() && is_whitespace(bytes[i]) {
+        i += 1;
+    }
+    let (generation, mut i) = parse_usize_digits(bytes, i)?;
+    while i < bytes.len() && is_whitespace(bytes[i]) {
+        i += 1;
+    }
+    if bytes.get(i) != Some(&b'R') {
+        return None;
+    }
+    i += 1;
+    let id = PDFObjectId { number, generation };
+    let (value_start, value_end) = latest_object_value_bounds(bytes, id, object_limit)?;
+    let mut value_i = value_start;
+    while value_i < value_end && is_whitespace(bytes[value_i]) {
+        value_i += 1;
+    }
+    let (value, value_end_i) = match bytes.get(value_i) {
+        Some(b'(') => parse_literal_string(bytes, value_i)?,
+        Some(b'<') => parse_hex_string(bytes, value_i)?,
+        _ => return None,
+    };
+    (value_end_i <= value_end).then_some((value, i))
+}
+
+fn latest_object_value_bounds(
+    bytes: &[u8],
+    id: PDFObjectId,
+    before: usize,
+) -> Option<(usize, usize)> {
+    let mut found = None;
+    let mut search_from = 0usize;
+    let limit = before.min(bytes.len());
+    while let Some(obj_range) = first_range(b" obj", bytes, search_from, Some(limit)) {
+        search_from = obj_range.end;
+        if obj_range.end > limit {
+            break;
+        }
+        let Some(object_id) = object_id_before_obj_keyword(obj_range.start, bytes) else {
+            continue;
+        };
+        let Some(object_end) = first_range(b"endobj", bytes, obj_range.end, Some(limit)) else {
+            continue;
+        };
+        search_from = object_end.end;
+        if object_id == id {
+            found = Some((obj_range.end, object_end.start));
+        }
+    }
+    found
+}
+
+fn decode_pdf_text_string(bytes: &[u8]) -> Option<String> {
+    if bytes.starts_with(&[0xef, 0xbb, 0xbf]) {
+        return String::from_utf8(bytes[3..].to_vec()).ok();
+    }
+    if bytes.starts_with(&[0xfe, 0xff]) {
+        return decode_utf16_units(&bytes[2..], false);
+    }
+    if bytes.starts_with(&[0xff, 0xfe]) {
+        return decode_utf16_units(&bytes[2..], true);
+    }
+    String::from_utf8(bytes.to_vec()).ok()
+}
+
+fn decode_utf16_units(bytes: &[u8], little_endian: bool) -> Option<String> {
+    if !bytes.len().is_multiple_of(2) {
+        return None;
+    }
+    let units = bytes.chunks(2).map(|chunk| {
+        if little_endian {
+            u16::from_le_bytes([chunk[0], chunk[1]])
+        } else {
+            u16::from_be_bytes([chunk[0], chunk[1]])
+        }
+    });
+    std::char::decode_utf16(units)
+        .collect::<Result<String, _>>()
+        .ok()
 }
 
 fn incremental_objects(bytes: &[u8]) -> Vec<IncrementalObject> {
@@ -2009,7 +2172,7 @@ endobj
         let pdf = br#"<< /Type /Sig /M (D\07220260603115804Z) >>"#;
 
         assert_eq!(
-            parse_modification_date(pdf, 0, pdf.len()),
+            parse_modification_date(pdf, 0, pdf.len(), pdf.len()),
             Some("D:20260603115804Z".to_owned())
         );
     }
@@ -2019,7 +2182,86 @@ endobj
         let pdf = br#"<< /Type /Sig /M <443A32303236303630333131353830345A> >>"#;
 
         assert_eq!(
-            parse_modification_date(pdf, 0, pdf.len()),
+            parse_modification_date(pdf, 0, pdf.len(), pdf.len()),
+            Some("D:20260603115804Z".to_owned())
+        );
+    }
+
+    #[test]
+    fn modification_date_matches_exact_pdf_name_token() {
+        let pdf = br#"<< /Type /Sig /Metadata (D:19990101000000Z) /M (D:20260603115804Z) >>"#;
+
+        assert_eq!(
+            parse_modification_date(pdf, 0, pdf.len(), pdf.len()),
+            Some("D:20260603115804Z".to_owned())
+        );
+    }
+
+    #[test]
+    fn modification_date_matches_escaped_pdf_name_token() {
+        let pdf = br#"<< /Type /Sig /#4D (D:20260603115804Z) >>"#;
+
+        assert_eq!(
+            parse_modification_date(pdf, 0, pdf.len(), pdf.len()),
+            Some("D:20260603115804Z".to_owned())
+        );
+    }
+
+    #[test]
+    fn modification_date_resolves_indirect_string() {
+        let pdf = br#"%PDF-1.7
+1 0 obj
+(D:20260603115804Z)
+endobj
+2 0 obj
+<< /Type /Sig /M 1 0 R >>
+endobj
+"#;
+        let dict_start = first_range(b"<<", pdf, 0, None).unwrap().start;
+        let dict_end = first_range(b">>", pdf, dict_start, None).unwrap().end;
+
+        assert_eq!(
+            parse_modification_date(pdf, dict_start, dict_end, pdf.len()),
+            Some("D:20260603115804Z".to_owned())
+        );
+    }
+
+    #[test]
+    fn modification_date_does_not_resolve_unsigned_indirect_string() {
+        let pdf = br#"%PDF-1.7
+1 0 obj
+<< /Type /Sig /M 2 0 R >>
+endobj
+2 0 obj
+(D:20260603115804Z)
+endobj
+"#;
+        let dict_start = first_range(b"<<", pdf, 0, None).unwrap().start;
+        let dict_end = first_range(b">>", pdf, dict_start, None).unwrap().end;
+
+        assert_eq!(
+            parse_modification_date(pdf, dict_start, dict_end, dict_end),
+            None
+        );
+    }
+
+    #[test]
+    fn modification_date_decodes_utf8_bom_pdf_string() {
+        let pdf = br#"<< /Type /Sig /M <EFBBBF443A32303236303630333131353830345A> >>"#;
+
+        assert_eq!(
+            parse_modification_date(pdf, 0, pdf.len(), pdf.len()),
+            Some("D:20260603115804Z".to_owned())
+        );
+    }
+
+    #[test]
+    fn modification_date_decodes_utf16_be_pdf_string() {
+        let pdf =
+            br#"<< /Type /Sig /M <FEFF0044003A00320030003200360030003600300033003100310035003800300034005A> >>"#;
+
+        assert_eq!(
+            parse_modification_date(pdf, 0, pdf.len(), pdf.len()),
             Some("D:20260603115804Z".to_owned())
         );
     }
