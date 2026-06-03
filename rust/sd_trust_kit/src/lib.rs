@@ -23,7 +23,9 @@ pub use report::{
     StandardsValidationResult, Status, Step, StepKind, TimestampDetails, ValidationIndication,
     ValidationReport, ValidationSubIndication, Verdict,
 };
-pub use revocation::{CrlCache, CrlCacheEntry, RevocationOptions, RevocationStatus};
+pub use revocation::{
+    CrlCache, CrlCacheEntry, OcspCache, OcspCacheEntry, RevocationOptions, RevocationStatus,
+};
 
 use cms::Cms;
 use pdf::SigDict;
@@ -270,7 +272,7 @@ pub fn verify_pdf_including_revocation_with_options(
         let Some(signature_report) = signatures.get_mut(signature_index) else {
             break;
         };
-        append_revocation_step(signature_report, sig, revocation_options);
+        append_revocation_step(signature_report, pdf, sig, revocation_options);
     }
 
     let mut all_reports = signatures.clone();
@@ -1123,6 +1125,7 @@ fn signing_certificate_hashes<T>(
 
 fn append_revocation_step(
     report: &mut SignatureReport,
+    pdf: &[u8],
     sig: &SigDict,
     options: &RevocationOptions,
 ) {
@@ -1169,18 +1172,35 @@ fn append_revocation_step(
     );
     issuer_certificates = trust::unique_certificates(issuer_certificates);
 
-    let validation_time = signature_revocation_time_unix_seconds(report, options.now_unix_seconds);
+    let mut ocsp_cache = options.ocsp_cache.clone();
+    for der in cms
+        .embedded_ocsp_responses()
+        .into_iter()
+        .chain(pdf::embedded_ocsp_responses(pdf))
+    {
+        ocsp_cache.entries.push(OcspCacheEntry {
+            cache_key_sha256: String::new(),
+            valid_until: f64::INFINITY,
+            der,
+            require_current_freshness: false,
+        });
+    }
+
+    let trusted_timestamp_time = trusted_signature_timestamp_time_unix_seconds(report);
+    let validation_time = trusted_timestamp_time.unwrap_or(options.now_unix_seconds);
     let status = revocation::check_certificate_status(
         &signer_cert_der,
         &issuer_certificates,
-        validation_time,
+        trusted_timestamp_time,
+        options.now_unix_seconds,
         &options.crl_cache,
+        &ocsp_cache,
     );
     match status {
         RevocationStatus::Good => report.steps.push(Step::new(
             StepKind::RevocationSigner,
             Status::Ok,
-            "certificate is not listed in the current CRL",
+            "certificate revocation evidence is acceptable and does not list revocation",
         )),
         RevocationStatus::Unavailable(error) => {
             report
@@ -1206,7 +1226,7 @@ fn append_revocation_step(
                 report.steps.push(Step::new(
                     StepKind::RevocationSigner,
                     Status::Fail,
-                    "certificate is listed as revoked; CRL did not include a revocation date",
+                    "certificate is listed as revoked; revocation evidence did not include a revocation date",
                 ));
             }
         }
@@ -1215,7 +1235,12 @@ fn append_revocation_step(
     report.refresh_preservation();
 }
 
+#[cfg(test)]
 fn signature_revocation_time_unix_seconds(report: &SignatureReport, now_unix_seconds: f64) -> f64 {
+    trusted_signature_timestamp_time_unix_seconds(report).unwrap_or(now_unix_seconds)
+}
+
+fn trusted_signature_timestamp_time_unix_seconds(report: &SignatureReport) -> Option<f64> {
     let has_trusted_timestamp =
         report
             .steps
@@ -1239,12 +1264,12 @@ fn signature_revocation_time_unix_seconds(report: &SignatureReport, now_unix_sec
             .and_then(|details| details.timestamp_time.as_deref())
         {
             if let Some(time) = revocation::asn1_time_to_unix_seconds(timestamp_time) {
-                return time;
+                return Some(time);
             }
         }
     }
 
-    now_unix_seconds
+    None
 }
 
 fn trust_anchors_for_time(

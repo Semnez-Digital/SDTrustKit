@@ -41,14 +41,49 @@ public struct TimedTrustAnchorSet: Encodable, Equatable, Sendable {
 public struct RevocationOptions: Encodable, Equatable, Sendable {
     public var nowUnixSeconds: Double?
     public var crlCacheEntries: [CrlCacheEntry]
+    public var ocspCacheEntries: [OcspCacheEntry]
 
-    public init(nowUnixSeconds: Double? = nil, crlCacheEntries: [CrlCacheEntry] = []) {
+    public init(
+        nowUnixSeconds: Double? = nil,
+        crlCacheEntries: [CrlCacheEntry] = [],
+        ocspCacheEntries: [OcspCacheEntry] = []
+    ) {
         self.nowUnixSeconds = nowUnixSeconds
         self.crlCacheEntries = crlCacheEntries
+        self.ocspCacheEntries = ocspCacheEntries
     }
 }
 
 public struct CrlCacheEntry: Encodable, Equatable, Sendable {
+    public var url: String?
+    public var cacheKeySha256: String?
+    public var validUntilUnixSeconds: Double
+    public var derBase64: String
+
+    public init(
+        url: String,
+        validUntilUnixSeconds: Double,
+        der: Data
+    ) {
+        self.url = url
+        self.cacheKeySha256 = nil
+        self.validUntilUnixSeconds = validUntilUnixSeconds
+        self.derBase64 = der.base64EncodedString()
+    }
+
+    public init(
+        cacheKeySha256: String,
+        validUntilUnixSeconds: Double,
+        der: Data
+    ) {
+        self.url = nil
+        self.cacheKeySha256 = cacheKeySha256
+        self.validUntilUnixSeconds = validUntilUnixSeconds
+        self.derBase64 = der.base64EncodedString()
+    }
+}
+
+public struct OcspCacheEntry: Encodable, Equatable, Sendable {
     public var url: String?
     public var cacheKeySha256: String?
     public var validUntilUnixSeconds: Double

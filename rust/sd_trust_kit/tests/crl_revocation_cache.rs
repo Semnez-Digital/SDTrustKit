@@ -1,5 +1,5 @@
 use sd_trust_kit::{
-    CrlCache, EuTrustedListCache, RevocationOptions, Status, Step, StepKind, Verdict,
+    CrlCache, EuTrustedListCache, OcspCache, RevocationOptions, Status, Step, StepKind, Verdict,
     VerificationOptions,
 };
 use std::fs;
@@ -16,6 +16,7 @@ fn crl_cache_fixtures_can_mark_signer_revocation_good() {
     };
     let revocation_options = RevocationOptions {
         crl_cache: crl_cache(),
+        ocsp_cache: OcspCache::default(),
         now_unix_seconds: now,
     };
 

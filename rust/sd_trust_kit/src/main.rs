@@ -1,6 +1,6 @@
 use sd_trust_kit::{
     verify_pdf, verify_pdf_including_revocation_with_options, verify_pdf_with_options, CrlCache,
-    EuTrustedListCache, RevocationOptions, ValidationReport, VerificationOptions,
+    EuTrustedListCache, OcspCache, RevocationOptions, ValidationReport, VerificationOptions,
 };
 use std::fs;
 use std::io::{self, Write};
@@ -130,6 +130,8 @@ fn verify_from_cli(cli: &Cli) -> Result<ValidationReport, String> {
                         )
                     },
                 )?,
+                ocsp_cache: OcspCache::from_directory(fixtures_dir.join("ocsp_cache"))
+                    .unwrap_or_default(),
                 now_unix_seconds: eu_cache.fetched_at_unix_time(),
             };
             Ok(verify_pdf_including_revocation_with_options(

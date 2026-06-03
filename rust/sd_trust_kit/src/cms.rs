@@ -7,6 +7,10 @@ pub const OID_SIGNING_TIME: &str = "1.2.840.113549.1.9.5";
 pub const OID_TIME_STAMP_TOKEN: &str = "1.2.840.113549.1.9.16.2.14";
 pub const OID_SIGNING_CERTIFICATE: &str = "1.2.840.113549.1.9.16.2.12";
 pub const OID_SIGNING_CERTIFICATE_V2: &str = "1.2.840.113549.1.9.16.2.47";
+pub const OID_REVOCATION_VALUES: &str = "1.2.840.113549.1.9.16.2.24";
+pub const OID_ADBE_REVOCATION_INFO_ARCHIVAL: &str = "1.2.840.113583.1.1.8";
+pub const OID_CMS_OCSP_RESPONSE: &str = "1.3.6.1.5.5.7.16.2";
+pub const OID_BASIC_OCSP_RESPONSE: &str = "1.3.6.1.5.5.7.48.1.1";
 pub const OID_TST_INFO: &str = "1.2.840.113549.1.9.16.1.4";
 pub const OID_SUBJECT_KEY_IDENTIFIER: &str = "2.5.29.14";
 
@@ -17,6 +21,7 @@ pub struct Cms {
     pub e_content_type_oid: String,
     pub e_content: Option<Vec<u8>>,
     pub certificates: Vec<Vec<u8>>,
+    pub other_revocation_infos: Vec<(String, Vec<u8>)>,
     pub signer_infos: Vec<SignerInfo>,
 }
 
@@ -208,6 +213,7 @@ impl Cms {
         }
 
         let mut certificates = Vec::new();
+        let mut other_revocation_infos = Vec::new();
         let mut signer_infos = Vec::new();
         while let Some(next) = sd_r.read_tlv() {
             match next.tag {
@@ -219,7 +225,9 @@ impl Cms {
                         }
                     }
                 }
-                0xa1 => {}
+                0xa1 => {
+                    other_revocation_infos.extend(parse_other_revocation_infos(&next.content));
+                }
                 0x31 => {
                     let mut sir = Reader::new(&next.content);
                     while let Some(si_tlv) = sir.read_tlv() {
@@ -240,6 +248,7 @@ impl Cms {
             e_content_type_oid,
             e_content,
             certificates,
+            other_revocation_infos,
             signer_infos,
         })
     }
@@ -265,6 +274,112 @@ impl Cms {
         }
         None
     }
+
+    pub fn embedded_ocsp_responses(&self) -> Vec<Vec<u8>> {
+        let mut out = Vec::new();
+        for (oid, value) in &self.other_revocation_infos {
+            if oid == OID_CMS_OCSP_RESPONSE || oid == OID_BASIC_OCSP_RESPONSE {
+                push_unique(&mut out, value.clone());
+            }
+        }
+        for signer in &self.signer_infos {
+            for (_, value) in signer
+                .signed_attrs
+                .iter()
+                .filter(|(oid, _)| oid == OID_ADBE_REVOCATION_INFO_ARCHIVAL)
+            {
+                for ocsp in ocsp_responses_from_adbe_revocation_info_archival(value) {
+                    push_unique(&mut out, ocsp);
+                }
+            }
+            for (_, value) in signer
+                .unsigned_attrs
+                .iter()
+                .filter(|(oid, _)| oid == OID_REVOCATION_VALUES)
+            {
+                for ocsp in ocsp_responses_from_revocation_values(value) {
+                    push_unique(&mut out, ocsp);
+                }
+            }
+        }
+        out
+    }
+}
+
+fn parse_other_revocation_infos(content: &[u8]) -> Vec<(String, Vec<u8>)> {
+    let mut out = Vec::new();
+    let mut reader = Reader::new(content);
+    while let Some(choice) = reader.read_tlv() {
+        if choice.tag == 0x30 {
+            let mut choice_reader = Reader::new(&choice.content);
+            let Some(oid_tlv) = choice_reader.read_tlv() else {
+                continue;
+            };
+            if oid_tlv.tag != 0x06 {
+                continue;
+            }
+            let Some(value_tlv) = choice_reader.read_tlv() else {
+                continue;
+            };
+            let value = if value_tlv.tag == 0xa0 {
+                let mut explicit_reader = Reader::new(&value_tlv.content);
+                explicit_reader
+                    .read_tlv()
+                    .map(|tlv| tlv.full_bytes)
+                    .unwrap_or(value_tlv.content)
+            } else {
+                value_tlv.full_bytes
+            };
+            out.push((asn1::oid_string(&oid_tlv.content), value));
+        }
+    }
+    out
+}
+
+fn ocsp_responses_from_adbe_revocation_info_archival(data: &[u8]) -> Vec<Vec<u8>> {
+    let mut out = Vec::new();
+    let mut values = Reader::new(data);
+    while let Some(value) = values.read_tlv() {
+        if value.tag == 0x30 {
+            out.extend(context_specific_sequence_items(&value.content, 0xa1));
+        }
+    }
+    out
+}
+
+fn ocsp_responses_from_revocation_values(data: &[u8]) -> Vec<Vec<u8>> {
+    let mut out = Vec::new();
+    let mut values = Reader::new(data);
+    while let Some(value) = values.read_tlv() {
+        if value.tag == 0x30 {
+            out.extend(context_specific_sequence_items(&value.content, 0xa1));
+        }
+    }
+    out
+}
+
+fn context_specific_sequence_items(data: &[u8], tag: u8) -> Vec<Vec<u8>> {
+    let mut out = Vec::new();
+    let mut reader = Reader::new(data);
+    while let Some(field) = reader.read_tlv() {
+        if field.tag != tag {
+            continue;
+        }
+        let mut sequence_reader = Reader::new(&field.content);
+        let Some(sequence) = sequence_reader.read_tlv() else {
+            continue;
+        };
+        if sequence.tag != 0x30 {
+            continue;
+        }
+        let mut items = Reader::new(&sequence.content);
+        while let Some(item) = items.read_tlv() {
+            if item.tag == 0x30 {
+                push_unique(&mut out, item.full_bytes);
+            }
+        }
+    }
+    out
 }
 
 fn der_encoded_signed_attributes(content: &[u8]) -> Option<Vec<u8>> {
@@ -411,6 +526,12 @@ fn extract_subject_key_identifier(cert_der: &[u8]) -> Option<Vec<u8>> {
     None
 }
 
+fn push_unique<T: Eq>(items: &mut Vec<T>, item: T) {
+    if !items.contains(&item) {
+        items.push(item);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -428,6 +549,7 @@ mod tests {
             e_content_type_oid: OID_DATA.to_owned(),
             e_content: None,
             certificates: vec![CERT.to_vec()],
+            other_revocation_infos: vec![],
             signer_infos: vec![],
         };
 
@@ -448,6 +570,7 @@ mod tests {
             e_content_type_oid: OID_DATA.to_owned(),
             e_content: None,
             certificates: vec![CERT.to_vec()],
+            other_revocation_infos: vec![],
             signer_infos: vec![],
         };
 

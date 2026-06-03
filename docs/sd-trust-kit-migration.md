@@ -116,7 +116,9 @@ boundary. The checked-in header lives at
 `rust/sd_trust_kit/include/sd_trust_kit.h`.
 
 Revocation-aware FFI remains deterministic and offline. Wrappers pass cached CRL
-entries explicitly:
+and OCSP entries explicitly. PAdES OCSP evidence already embedded in CMS/adbe
+archival attributes, CMS revocation values, `/DSS`, or `/VRI` dictionaries is
+read from the PDF and validated by the same revocation path.
 
 ```json
 {
@@ -128,14 +130,22 @@ entries explicitly:
       "validUntilUnixSeconds": 1779530582.0,
       "derBase64": "..."
     }
+  ],
+  "ocspCacheEntries": [
+    {
+      "url": "https://example.com/ocsp",
+      "cacheKeySha256": "optional-precomputed-cache-key",
+      "validUntilUnixSeconds": 1779530582.0,
+      "derBase64": "..."
+    }
   ]
 }
 ```
 
 `url` is normalized and hashed the same way as the Rust verifier. A wrapper may
 provide `cacheKeySha256` instead when it already owns a cache keyed by normalized
-CRL URL hash. `nowUnixSeconds` is required when `crlCacheEntries` is non-empty
-so CRL expiration checks are deterministic.
+CRL or OCSP URL hash. `nowUnixSeconds` is required when `crlCacheEntries` or
+`ocspCacheEntries` is non-empty so freshness checks are deterministic.
 
 ## Swift Package And XCFramework
 
@@ -267,8 +277,8 @@ revocation-aware verifier.
 | EU trusted-list cache | Implemented offline | Parses the Swift `trusted-certificates-v2.json` fixture, applies matching status/date/service filters, and feeds signer/TSA timed anchors into `VerificationOptions`. Network refresh is still pending. |
 | Platform system trust | Pending | Needs cross-platform trust abstraction. |
 | User-supplied anchors | Implemented | Available through `VerificationOptions`; wrappers own trust material. |
-| CRL revocation | Implemented offline | Deterministic cache-backed signer CRL checks are implemented for checked-in fixtures, including CRL signature authentication and revoked-serial lookup. Network fetch/refresh is still pending. |
-| FFI | Initial ABI implemented | String-based C ABI returns report JSON, accepts caller-supplied trust anchors/pins and deterministic CRL cache entries via JSON, and includes ownership/error tests. Network refresh FFI remains pending. |
+| Signer revocation | Implemented offline | Deterministic cache-backed CRL and OCSP checks are implemented, including CRL/OCSP signature authentication, OCSP responder authorization, CertID matching, `thisUpdate`/`nextUpdate` handling, archiveCutOff/certHash consistency, and revoked-status lookup. Embedded PAdES OCSP evidence is loaded from CMS/adbe archival values, CMS revocation values, `/DSS`, and `/VRI`; network fetch/refresh is still pending. |
+| FFI | Initial ABI implemented | String-based C ABI returns report JSON, accepts caller-supplied trust anchors/pins and deterministic CRL/OCSP cache entries via JSON, and includes ownership/error tests. Network refresh FFI remains pending. |
 | Swift wrapper prototype | Implemented | Thin `dlopen` wrapper calls the C ABI and decodes reports; one corpus smoke test compares against the Rust CLI. |
 
 ## Full Baseline Harness

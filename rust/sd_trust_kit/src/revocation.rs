@@ -1,17 +1,25 @@
 use crate::{asn1, crypto};
 use base64::Engine;
 use serde::Deserialize;
+use sha1::Sha1;
 use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::Path;
 
 const APPLE_REFERENCE_UNIX_OFFSET: f64 = 978_307_200.0;
+const OID_AUTHORITY_INFO_ACCESS: &str = "1.3.6.1.5.5.7.1.1";
+const OID_OCSP: &str = "1.3.6.1.5.5.7.48.1";
+const OID_BASIC_OCSP_RESPONSE: &str = "1.3.6.1.5.5.7.48.1.1";
+const OID_OCSP_ARCHIVE_CUTOFF: &str = "1.3.6.1.5.5.7.48.1.6";
+const OID_OCSP_SIGNING_EKU: &str = "1.3.6.1.5.5.7.3.9";
 const OID_CRL_DISTRIBUTION_POINTS: &str = "2.5.29.31";
+const OID_CERT_HASH: &str = "1.3.36.8.3.13";
 const CEI_FALLBACK_CRL_URL: &str = "https://crl.cei.mai.gov.ro/crl/ro_cei_mai_sub-ca.crl";
 
 #[derive(Clone, Debug, Default)]
 pub struct RevocationOptions {
     pub crl_cache: CrlCache,
+    pub ocsp_cache: OcspCache,
     pub now_unix_seconds: f64,
 }
 
@@ -28,6 +36,23 @@ pub struct CrlCacheEntry {
     pub valid_until: f64,
     #[serde(deserialize_with = "deserialize_base64_der")]
     pub der: Vec<u8>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct OcspCache {
+    pub entries: Vec<OcspCacheEntry>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+pub struct OcspCacheEntry {
+    #[serde(skip)]
+    pub cache_key_sha256: String,
+    #[serde(rename = "validUntil")]
+    pub valid_until: f64,
+    #[serde(deserialize_with = "deserialize_base64_der")]
+    pub der: Vec<u8>,
+    #[serde(skip, default = "default_true")]
+    pub require_current_freshness: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -50,6 +75,53 @@ struct ParsedCrl {
 struct RevokedEntry {
     serial: Vec<u8>,
     revocation_date: Option<f64>,
+}
+
+struct ParsedOcspResponse {
+    tbs: Vec<u8>,
+    responder_id: OcspResponderId,
+    produced_at: f64,
+    signature_alg_oid: String,
+    signature_alg_params: Option<Vec<u8>>,
+    signature: Vec<u8>,
+    single_responses: Vec<OcspSingleResponse>,
+    certificates: Vec<Vec<u8>>,
+}
+
+enum OcspResponderId {
+    ByName(Vec<u8>),
+    ByKey(Vec<u8>),
+}
+
+struct OcspSingleResponse {
+    hash_alg_oid: String,
+    issuer_name_hash: Vec<u8>,
+    issuer_key_hash: Vec<u8>,
+    serial: Vec<u8>,
+    status: OcspCertificateStatus,
+    this_update: Option<f64>,
+    next_update: Option<f64>,
+    archive_cutoff: Option<f64>,
+    cert_hash: Option<OcspCertHash>,
+}
+
+struct OcspCertHash {
+    hash_alg_oid: String,
+    digest: Vec<u8>,
+}
+
+enum OcspCertificateStatus {
+    Good,
+    Revoked { revoked_at: Option<f64> },
+    Unknown,
+}
+
+struct ParsedCertificateSignature {
+    tbs: Vec<u8>,
+    issuer: Vec<u8>,
+    signature_alg_oid: String,
+    signature_alg_params: Option<Vec<u8>>,
+    signature: Vec<u8>,
 }
 
 impl CrlCache {
@@ -87,11 +159,50 @@ impl CrlCache {
     }
 }
 
+impl OcspCache {
+    pub fn from_directory(path: impl AsRef<Path>) -> std::io::Result<Self> {
+        let mut entries = Vec::new();
+        for entry in fs::read_dir(path)? {
+            let path = entry?.path();
+            if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
+                continue;
+            }
+            let Some(stem) = path.file_stem().and_then(|stem| stem.to_str()) else {
+                continue;
+            };
+            let data = fs::read(&path)?;
+            let mut cache_entry = Self::entry_from_json_slice(&data)
+                .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
+            cache_entry.cache_key_sha256 = stem.to_ascii_lowercase();
+            entries.push(cache_entry);
+        }
+        entries.sort_by(|a, b| a.cache_key_sha256.cmp(&b.cache_key_sha256));
+        Ok(Self { entries })
+    }
+
+    pub fn entry_from_json_slice(data: &[u8]) -> Result<OcspCacheEntry, serde_json::Error> {
+        serde_json::from_slice(data)
+    }
+
+    fn current_entries(&self, now_unix_seconds: f64) -> impl Iterator<Item = &OcspCacheEntry> {
+        let now_apple_seconds = unix_time_to_apple_reference_time(now_unix_seconds);
+        self.entries.iter().filter(move |entry| {
+            !entry.require_current_freshness || entry.valid_until > now_apple_seconds
+        })
+    }
+}
+
+fn default_true() -> bool {
+    true
+}
+
 pub fn check_certificate_status(
     cert_der: &[u8],
     issuer_certificates: &[Vec<u8>],
+    control_unix_seconds: Option<f64>,
     now_unix_seconds: f64,
     cache: &CrlCache,
+    ocsp_cache: &OcspCache,
 ) -> RevocationStatus {
     let Some(serial) = certificate_serial(cert_der) else {
         return RevocationStatus::Unavailable(
@@ -99,11 +210,24 @@ pub fn check_certificate_status(
         );
     };
 
+    let ocsp_status = check_ocsp_status(
+        cert_der,
+        issuer_certificates,
+        &serial,
+        control_unix_seconds,
+        now_unix_seconds,
+        ocsp_cache,
+    );
+    if !matches!(ocsp_status, RevocationStatus::Unavailable(_)) {
+        return ocsp_status;
+    }
+
     let urls = crl_urls(cert_der);
     if urls.is_empty() {
-        return RevocationStatus::Unavailable(
-            "Couldn't find a revocation list for the signing certificate.".to_owned(),
-        );
+        if !ocsp_urls(cert_der).is_empty() {
+            return ocsp_status;
+        }
+        return RevocationStatus::Unavailable(no_revocation_evidence_message());
     }
 
     let mut last_failure = None;
@@ -227,6 +351,100 @@ fn asn1_time_digit_count(raw: &str) -> usize {
         .count()
 }
 
+fn check_ocsp_status(
+    cert_der: &[u8],
+    issuer_certificates: &[Vec<u8>],
+    serial: &[u8],
+    control_unix_seconds: Option<f64>,
+    now_unix_seconds: f64,
+    cache: &OcspCache,
+) -> RevocationStatus {
+    let has_ocsp_responder = !ocsp_urls(cert_der).is_empty();
+    let mut last_failure = None;
+    for entry in cache.current_entries(now_unix_seconds) {
+        let Some(response) = parse_ocsp_response(&entry.der) else {
+            last_failure =
+                Some("The signing certificate OCSP response couldn't be read.".to_owned());
+            continue;
+        };
+        let Some((single_response, issuer_der)) =
+            matching_ocsp_single_response(&response, cert_der, issuer_certificates, serial)
+        else {
+            continue;
+        };
+        if !authenticate_ocsp_response(&response, issuer_der) {
+            last_failure =
+                Some("The signing certificate OCSP response couldn't be authenticated.".to_owned());
+            continue;
+        }
+        let Some(this_update) = single_response.this_update else {
+            last_failure = Some(
+                "The signing certificate OCSP response does not contain thisUpdate.".to_owned(),
+            );
+            continue;
+        };
+        if entry.require_current_freshness {
+            let Some(next_update) = single_response.next_update else {
+                last_failure = Some(
+                    "The signing certificate OCSP response does not contain nextUpdate.".to_owned(),
+                );
+                continue;
+            };
+            if now_unix_seconds < this_update {
+                last_failure =
+                    Some("The signing certificate OCSP response is not valid yet.".to_owned());
+                continue;
+            }
+            if next_update <= now_unix_seconds {
+                last_failure = Some("The signing certificate OCSP response is expired.".to_owned());
+                continue;
+            }
+        }
+        if control_unix_seconds.is_some_and(|control_time| this_update < control_time) {
+            last_failure = Some(
+                "The signing certificate OCSP response is older than the certificate validation time."
+                    .to_owned(),
+            );
+            continue;
+        }
+        if response.produced_at < this_update {
+            last_failure = Some(
+                "The signing certificate OCSP response was produced before thisUpdate.".to_owned(),
+            );
+            continue;
+        }
+        if !ocsp_response_is_consistent_with_certificate(single_response, cert_der) {
+            last_failure = Some(
+                "The signing certificate OCSP response is not consistent with the signing certificate validity."
+                    .to_owned(),
+            );
+            continue;
+        }
+        return match single_response.status {
+            OcspCertificateStatus::Good => RevocationStatus::Good,
+            OcspCertificateStatus::Revoked { revoked_at } => {
+                RevocationStatus::Revoked { revoked_at }
+            }
+            OcspCertificateStatus::Unknown => RevocationStatus::Unavailable(
+                "The signing certificate OCSP responder returned an unknown status.".to_owned(),
+            ),
+        };
+    }
+
+    RevocationStatus::Unavailable(last_failure.unwrap_or_else(|| {
+        if has_ocsp_responder {
+            "Couldn't check the signing certificate OCSP responder. Check your internet connection and try again."
+                .to_owned()
+        } else {
+            no_revocation_evidence_message()
+        }
+    }))
+}
+
+fn no_revocation_evidence_message() -> String {
+    "Couldn't find revocation evidence for the signing certificate.".to_owned()
+}
+
 fn crl_urls(cert_der: &[u8]) -> Vec<String> {
     let mut urls = Vec::new();
     for url in crl_distribution_point_urls(cert_der) {
@@ -271,6 +489,14 @@ fn crl_distribution_point_urls(cert_der: &[u8]) -> Vec<String> {
 }
 
 fn normalize_crl_url(url: &str) -> Option<String> {
+    normalize_http_url(url)
+}
+
+fn normalize_ocsp_url(url: &str) -> Option<String> {
+    normalize_http_url(url)
+}
+
+fn normalize_http_url(url: &str) -> Option<String> {
     let lower = url.to_ascii_lowercase();
     let rest = if lower.starts_with("http://") {
         &url[7..]
@@ -290,7 +516,15 @@ pub(crate) fn crl_cache_key_for_url(url: &str) -> Option<String> {
     normalize_crl_url(url).map(|url| crl_cache_key(&url))
 }
 
+pub(crate) fn ocsp_cache_key_for_url(url: &str) -> Option<String> {
+    normalize_ocsp_url(url).map(|url| ocsp_cache_key(&url))
+}
+
 fn crl_cache_key(url: &str) -> String {
+    hex::encode(Sha256::digest(url.as_bytes()))
+}
+
+fn ocsp_cache_key(url: &str) -> String {
     hex::encode(Sha256::digest(url.as_bytes()))
 }
 
@@ -365,6 +599,552 @@ fn parse_crl(der: &[u8]) -> Option<ParsedCrl> {
         signature: signature_value.content[1..].to_vec(),
         next_update,
         revoked_entries,
+    })
+}
+
+fn ocsp_urls(cert_der: &[u8]) -> Vec<String> {
+    let Some(extensions) = certificate_extensions(cert_der) else {
+        return Vec::new();
+    };
+    let mut urls = Vec::new();
+    for ext in extensions {
+        let mut ext_reader = asn1::Reader::new(&ext);
+        let Some(oid_tlv) = ext_reader.read_tlv() else {
+            continue;
+        };
+        if oid_tlv.tag != 0x06 || asn1::oid_string(&oid_tlv.content) != OID_AUTHORITY_INFO_ACCESS {
+            continue;
+        }
+        if ext_reader.peek_tag() == Some(0x01) {
+            let _ = ext_reader.read_tlv();
+        }
+        let Some(value) = ext_reader.read_tlv() else {
+            continue;
+        };
+        if value.tag != 0x04 {
+            continue;
+        }
+        let mut aia_reader = asn1::Reader::new(&value.content);
+        let Some(aia_seq) = aia_reader.read_tlv() else {
+            continue;
+        };
+        if aia_seq.tag != 0x30 {
+            continue;
+        }
+        let mut descriptions = asn1::Reader::new(&aia_seq.content);
+        while let Some(description) = descriptions.read_tlv() {
+            if description.tag != 0x30 {
+                continue;
+            }
+            let mut description_reader = asn1::Reader::new(&description.content);
+            let Some(method) = description_reader.read_tlv() else {
+                continue;
+            };
+            if method.tag != 0x06 || asn1::oid_string(&method.content) != OID_OCSP {
+                continue;
+            }
+            let Some(location) = description_reader.read_tlv() else {
+                continue;
+            };
+            if location.tag == 0x86 {
+                if let Ok(url) = String::from_utf8(location.content) {
+                    if let Some(normalized) = normalize_ocsp_url(&url) {
+                        if !urls.contains(&normalized) {
+                            urls.push(normalized);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    urls
+}
+
+fn parse_ocsp_response(der: &[u8]) -> Option<ParsedOcspResponse> {
+    parse_wrapped_ocsp_response(der).or_else(|| parse_basic_ocsp_response(der))
+}
+
+fn parse_wrapped_ocsp_response(der: &[u8]) -> Option<ParsedOcspResponse> {
+    let mut reader = asn1::Reader::new(der);
+    let response = reader.read_tlv()?;
+    if response.tag != 0x30 {
+        return None;
+    }
+    let mut response_reader = asn1::Reader::new(&response.content);
+    let status = response_reader.read_tlv()?;
+    if status.tag != 0x0a || status.content != [0] {
+        return None;
+    }
+    let response_bytes = response_reader.read_tlv()?;
+    if response_bytes.tag != 0xa0 {
+        return None;
+    }
+    let mut response_bytes_reader = asn1::Reader::new(&response_bytes.content);
+    let response_bytes_seq = response_bytes_reader.read_tlv()?;
+    if response_bytes_seq.tag != 0x30 {
+        return None;
+    }
+    let mut body = asn1::Reader::new(&response_bytes_seq.content);
+    let response_type = body.read_tlv()?;
+    if response_type.tag != 0x06
+        || asn1::oid_string(&response_type.content) != OID_BASIC_OCSP_RESPONSE
+    {
+        return None;
+    }
+    let response_octets = body.read_tlv()?;
+    if response_octets.tag != 0x04 {
+        return None;
+    }
+    parse_basic_ocsp_response(&response_octets.content)
+}
+
+fn parse_basic_ocsp_response(der: &[u8]) -> Option<ParsedOcspResponse> {
+    let mut reader = asn1::Reader::new(der);
+    let response = reader.read_tlv()?;
+    if response.tag != 0x30 {
+        return None;
+    }
+    let mut response_reader = asn1::Reader::new(&response.content);
+    let tbs = response_reader.read_tlv()?;
+    let signature_algorithm = response_reader.read_tlv()?;
+    let signature_value = response_reader.read_tlv()?;
+    if tbs.tag != 0x30
+        || signature_algorithm.tag != 0x30
+        || signature_value.tag != 0x03
+        || signature_value.content.first() != Some(&0)
+    {
+        return None;
+    }
+    let (signature_alg_oid, signature_alg_params) =
+        crate::cms::algorithm_identifier_oid_and_params(&signature_algorithm.content)?;
+    let mut certificates = Vec::new();
+    if response_reader.peek_tag() == Some(0xa0) {
+        let certs = response_reader.read_tlv()?;
+        let mut certs_reader = asn1::Reader::new(&certs.content);
+        let cert_seq = certs_reader.read_tlv()?;
+        if cert_seq.tag == 0x30 {
+            let mut cert_reader = asn1::Reader::new(&cert_seq.content);
+            while let Some(cert) = cert_reader.read_tlv() {
+                if cert.tag == 0x30 {
+                    certificates.push(cert.full_bytes);
+                }
+            }
+        }
+    }
+
+    let mut tbs_reader = asn1::Reader::new(&tbs.content);
+    if tbs_reader.peek_tag() == Some(0xa0) {
+        let _ = tbs_reader.read_tlv();
+    }
+    let responder_id_tlv = tbs_reader.read_tlv()?;
+    let responder_id = parse_ocsp_responder_id(&responder_id_tlv)?;
+    let produced_at_tlv = tbs_reader.read_tlv()?;
+    if produced_at_tlv.tag != 0x18 {
+        return None;
+    }
+    let produced_at = time_tlv_to_unix_seconds(&produced_at_tlv)?;
+    let responses = tbs_reader.read_tlv()?;
+    if responses.tag != 0x30 {
+        return None;
+    }
+    let mut responses_reader = asn1::Reader::new(&responses.content);
+    let mut single_responses = Vec::new();
+    while let Some(single) = responses_reader.read_tlv() {
+        if single.tag != 0x30 {
+            continue;
+        }
+        if let Some(parsed) = parse_ocsp_single_response(&single.content) {
+            single_responses.push(parsed);
+        }
+    }
+    Some(ParsedOcspResponse {
+        tbs: tbs.full_bytes,
+        responder_id,
+        produced_at,
+        signature_alg_oid,
+        signature_alg_params,
+        signature: signature_value.content[1..].to_vec(),
+        single_responses,
+        certificates,
+    })
+}
+
+fn parse_ocsp_responder_id(tlv: &asn1::Tlv) -> Option<OcspResponderId> {
+    match tlv.tag {
+        0xa1 => {
+            let mut reader = asn1::Reader::new(&tlv.content);
+            let name = reader.read_tlv()?;
+            if name.tag == 0x30 {
+                Some(OcspResponderId::ByName(name.full_bytes))
+            } else {
+                None
+            }
+        }
+        0x82 => Some(OcspResponderId::ByKey(tlv.content.clone())),
+        0xa2 => {
+            let mut reader = asn1::Reader::new(&tlv.content);
+            let key_hash = reader.read_tlv()?;
+            if key_hash.tag == 0x04 {
+                Some(OcspResponderId::ByKey(key_hash.content))
+            } else {
+                Some(OcspResponderId::ByKey(tlv.content.clone()))
+            }
+        }
+        _ => None,
+    }
+}
+
+fn parse_ocsp_single_response(data: &[u8]) -> Option<OcspSingleResponse> {
+    let mut reader = asn1::Reader::new(data);
+    let cert_id = reader.read_tlv()?;
+    if cert_id.tag != 0x30 {
+        return None;
+    }
+    let mut cert_id_reader = asn1::Reader::new(&cert_id.content);
+    let hash_algorithm = cert_id_reader.read_tlv()?;
+    if hash_algorithm.tag != 0x30 {
+        return None;
+    }
+    let hash_alg_oid = crate::cms::algorithm_identifier_oid(&hash_algorithm.content)?;
+    let issuer_name_hash = cert_id_reader.read_tlv()?;
+    let issuer_key_hash = cert_id_reader.read_tlv()?;
+    let serial = cert_id_reader.read_tlv()?;
+    if issuer_name_hash.tag != 0x04 || issuer_key_hash.tag != 0x04 || serial.tag != 0x02 {
+        return None;
+    }
+    let status_tlv = reader.read_tlv()?;
+    let status = match status_tlv.tag {
+        0x80 => OcspCertificateStatus::Good,
+        0x81 | 0xa1 => OcspCertificateStatus::Revoked {
+            revoked_at: parse_ocsp_revocation_time(&status_tlv),
+        },
+        0x82 => OcspCertificateStatus::Unknown,
+        _ => return None,
+    };
+    let this_update = reader
+        .read_tlv()
+        .as_ref()
+        .and_then(time_tlv_to_unix_seconds);
+    let mut next_update = None;
+    let mut archive_cutoff = None;
+    let mut cert_hash = None;
+    while let Some(optional) = reader.read_tlv() {
+        match optional.tag {
+            0xa0 => {
+                let mut next_reader = asn1::Reader::new(&optional.content);
+                next_update = next_reader
+                    .read_tlv()
+                    .as_ref()
+                    .and_then(time_tlv_to_unix_seconds);
+            }
+            0xa1 => {
+                let (parsed_archive_cutoff, parsed_cert_hash) =
+                    parse_ocsp_single_response_extensions(&optional.content);
+                archive_cutoff = parsed_archive_cutoff;
+                cert_hash = parsed_cert_hash;
+            }
+            _ => {}
+        }
+    }
+    Some(OcspSingleResponse {
+        hash_alg_oid,
+        issuer_name_hash: issuer_name_hash.content,
+        issuer_key_hash: issuer_key_hash.content,
+        serial: normalize_serial(&serial.content),
+        status,
+        this_update,
+        next_update,
+        archive_cutoff,
+        cert_hash,
+    })
+}
+
+fn parse_ocsp_single_response_extensions(data: &[u8]) -> (Option<f64>, Option<OcspCertHash>) {
+    let mut archive_cutoff = None;
+    let mut cert_hash = None;
+    let mut extensions_reader = asn1::Reader::new(data);
+    let Some(extensions) = extensions_reader.read_tlv() else {
+        return (archive_cutoff, cert_hash);
+    };
+    if extensions.tag != 0x30 {
+        return (archive_cutoff, cert_hash);
+    }
+    let mut extension_list = asn1::Reader::new(&extensions.content);
+    while let Some(ext) = extension_list.read_tlv() {
+        if ext.tag != 0x30 {
+            continue;
+        }
+        let mut ext_reader = asn1::Reader::new(&ext.content);
+        let Some(oid_tlv) = ext_reader.read_tlv() else {
+            continue;
+        };
+        if oid_tlv.tag != 0x06 {
+            continue;
+        }
+        let oid = asn1::oid_string(&oid_tlv.content);
+        if ext_reader.peek_tag() == Some(0x01) {
+            let _ = ext_reader.read_tlv();
+        }
+        let Some(value) = ext_reader.read_tlv() else {
+            continue;
+        };
+        if value.tag != 0x04 {
+            continue;
+        }
+        match oid.as_str() {
+            OID_OCSP_ARCHIVE_CUTOFF => {
+                archive_cutoff = parse_ocsp_archive_cutoff(&value.content);
+            }
+            OID_CERT_HASH => {
+                cert_hash = parse_ocsp_cert_hash(&value.content);
+            }
+            _ => {}
+        }
+    }
+    (archive_cutoff, cert_hash)
+}
+
+fn parse_ocsp_archive_cutoff(data: &[u8]) -> Option<f64> {
+    let mut reader = asn1::Reader::new(data);
+    reader
+        .read_tlv()
+        .as_ref()
+        .and_then(time_tlv_to_unix_seconds)
+}
+
+fn parse_ocsp_cert_hash(data: &[u8]) -> Option<OcspCertHash> {
+    let mut reader = asn1::Reader::new(data);
+    let cert_hash = reader.read_tlv()?;
+    if cert_hash.tag != 0x30 {
+        return None;
+    }
+    let mut cert_hash_reader = asn1::Reader::new(&cert_hash.content);
+    let hash_algorithm = cert_hash_reader.read_tlv()?;
+    let certificate_hash = cert_hash_reader.read_tlv()?;
+    if hash_algorithm.tag != 0x30 || certificate_hash.tag != 0x04 {
+        return None;
+    }
+    Some(OcspCertHash {
+        hash_alg_oid: crate::cms::algorithm_identifier_oid(&hash_algorithm.content)?,
+        digest: certificate_hash.content,
+    })
+}
+
+fn parse_ocsp_revocation_time(status_tlv: &asn1::Tlv) -> Option<f64> {
+    let mut reader = asn1::Reader::new(&status_tlv.content);
+    reader
+        .read_tlv()
+        .as_ref()
+        .and_then(time_tlv_to_unix_seconds)
+}
+
+fn matching_ocsp_single_response<'a>(
+    response: &'a ParsedOcspResponse,
+    cert_der: &[u8],
+    issuer_certificates: &'a [Vec<u8>],
+    serial: &[u8],
+) -> Option<(&'a OcspSingleResponse, &'a [u8])> {
+    let cert_issuer = certificate_issuer(cert_der)?;
+    for issuer_der in issuer_certificates {
+        let Some(issuer_subject) = certificate_subject(issuer_der) else {
+            continue;
+        };
+        if issuer_subject != cert_issuer {
+            continue;
+        }
+        for single_response in &response.single_responses {
+            if single_response.serial == serial
+                && ocsp_cert_id_matches_issuer(single_response, issuer_der)
+            {
+                return Some((single_response, issuer_der));
+            }
+        }
+    }
+    None
+}
+
+fn ocsp_cert_id_matches_issuer(response: &OcspSingleResponse, issuer_der: &[u8]) -> bool {
+    let Some(issuer_subject) = certificate_subject(issuer_der) else {
+        return false;
+    };
+    let Some(issuer_public_key) = certificate_subject_public_key_bytes(issuer_der) else {
+        return false;
+    };
+    let Some(name_hash) = crypto::digest(&issuer_subject, &response.hash_alg_oid) else {
+        return false;
+    };
+    let Some(key_hash) = crypto::digest(&issuer_public_key, &response.hash_alg_oid) else {
+        return false;
+    };
+    response.issuer_name_hash == name_hash && response.issuer_key_hash == key_hash
+}
+
+fn ocsp_response_is_consistent_with_certificate(
+    response: &OcspSingleResponse,
+    cert_der: &[u8],
+) -> bool {
+    let Some((not_before, not_after)) = certificate_validity(cert_der) else {
+        return false;
+    };
+    let Some(this_update) = response.this_update else {
+        return false;
+    };
+    if this_update < not_before {
+        return false;
+    }
+    if let Some(cert_hash) = &response.cert_hash {
+        let Some(expected) = crypto::digest(cert_der, &cert_hash.hash_alg_oid) else {
+            return false;
+        };
+        if cert_hash.digest != expected {
+            return false;
+        }
+        return true;
+    }
+    let revocation_covers_until = response.archive_cutoff.unwrap_or(this_update);
+    not_after >= revocation_covers_until
+}
+
+fn authenticate_ocsp_response(response: &ParsedOcspResponse, issuer_der: &[u8]) -> bool {
+    if !revocation_signature_algorithm_is_acceptable(&response.signature_alg_oid) {
+        return false;
+    }
+    let mut candidates = vec![issuer_der.to_vec()];
+    candidates.extend(response.certificates.iter().cloned());
+    for responder_der in unique_bytes(candidates) {
+        if !ocsp_responder_id_matches(&response.responder_id, &responder_der) {
+            continue;
+        }
+        let authorized = responder_der == issuer_der
+            || delegated_ocsp_responder_is_authorized(
+                &responder_der,
+                issuer_der,
+                response.produced_at,
+            );
+        if !authorized {
+            continue;
+        }
+        let digest_oid = crypto::normalized_digest_oid(&response.signature_alg_oid);
+        let Some(digest) = crypto::digest(&response.tbs, digest_oid) else {
+            continue;
+        };
+        if crypto::verify_signature_digest(
+            &response.signature_alg_oid,
+            response.signature_alg_params.as_deref(),
+            digest_oid,
+            &digest,
+            &response.signature,
+            &responder_der,
+        ) {
+            return true;
+        }
+    }
+    false
+}
+
+fn ocsp_responder_id_matches(responder_id: &OcspResponderId, cert_der: &[u8]) -> bool {
+    match responder_id {
+        OcspResponderId::ByName(name) => {
+            certificate_subject(cert_der).is_some_and(|subject| subject == *name)
+        }
+        OcspResponderId::ByKey(key_hash) => {
+            let Some(public_key) = certificate_subject_public_key_bytes(cert_der) else {
+                return false;
+            };
+            let digest = Sha1::digest(public_key);
+            let digest_bytes: &[u8] = digest.as_ref();
+            key_hash.as_slice() == digest_bytes
+        }
+    }
+}
+
+fn delegated_ocsp_responder_is_authorized(
+    responder_der: &[u8],
+    issuer_der: &[u8],
+    produced_at_unix_seconds: f64,
+) -> bool {
+    if !crate::trust::cert_has_extended_key_usage(responder_der, OID_OCSP_SIGNING_EKU) {
+        return false;
+    }
+    if !certificate_key_usage_allows_digital_signature(responder_der).unwrap_or(true) {
+        return false;
+    }
+    if !crate::trust::certificate_is_valid_at_unix_time(responder_der, produced_at_unix_seconds)
+        .unwrap_or(false)
+    {
+        return false;
+    }
+    verify_certificate_signed_by(responder_der, issuer_der)
+}
+
+fn verify_certificate_signed_by(cert_der: &[u8], issuer_der: &[u8]) -> bool {
+    let Some(cert) = parse_certificate_signature(cert_der) else {
+        return false;
+    };
+    let Some(issuer_subject) = certificate_subject(issuer_der) else {
+        return false;
+    };
+    if cert.issuer != issuer_subject {
+        return false;
+    }
+    let digest_oid = crypto::normalized_digest_oid(&cert.signature_alg_oid);
+    let Some(digest) = crypto::digest(&cert.tbs, digest_oid) else {
+        return false;
+    };
+    crypto::verify_signature_digest(
+        &cert.signature_alg_oid,
+        cert.signature_alg_params.as_deref(),
+        digest_oid,
+        &digest,
+        &cert.signature,
+        issuer_der,
+    )
+}
+
+fn revocation_signature_algorithm_is_acceptable(signature_alg_oid: &str) -> bool {
+    matches!(
+        crypto::normalized_digest_oid(signature_alg_oid),
+        crypto::OID_SHA256 | crypto::OID_SHA384 | crypto::OID_SHA512
+    )
+}
+
+fn parse_certificate_signature(der: &[u8]) -> Option<ParsedCertificateSignature> {
+    let mut reader = asn1::Reader::new(der);
+    let cert = reader.read_tlv()?;
+    if cert.tag != 0x30 {
+        return None;
+    }
+    let mut cert_reader = asn1::Reader::new(&cert.content);
+    let tbs = cert_reader.read_tlv()?;
+    let signature_algorithm = cert_reader.read_tlv()?;
+    let signature_value = cert_reader.read_tlv()?;
+    if tbs.tag != 0x30
+        || signature_algorithm.tag != 0x30
+        || signature_value.tag != 0x03
+        || signature_value.content.first() != Some(&0)
+    {
+        return None;
+    }
+    let mut tbs_reader = asn1::Reader::new(&tbs.content);
+    if tbs_reader.peek_tag() == Some(0xa0) {
+        let _ = tbs_reader.read_tlv();
+    }
+    tbs_reader.skip_one_tlv();
+    tbs_reader.skip_one_tlv();
+    let issuer = tbs_reader.read_tlv()?;
+    tbs_reader.skip_one_tlv();
+    let subject = tbs_reader.read_tlv()?;
+    if issuer.tag != 0x30 || subject.tag != 0x30 {
+        return None;
+    }
+    let (signature_alg_oid, signature_alg_params) =
+        crate::cms::algorithm_identifier_oid_and_params(&signature_algorithm.content)?;
+    Some(ParsedCertificateSignature {
+        tbs: tbs.full_bytes,
+        issuer: issuer.full_bytes,
+        signature_alg_oid,
+        signature_alg_params,
+        signature: signature_value.content[1..].to_vec(),
     })
 }
 
@@ -446,6 +1226,94 @@ fn certificate_subject(der: &[u8]) -> Option<Vec<u8>> {
     } else {
         None
     }
+}
+
+fn certificate_subject_public_key_bytes(der: &[u8]) -> Option<Vec<u8>> {
+    let tbs = certificate_tbs(der)?;
+    let mut reader = asn1::Reader::new(&tbs.content);
+    if reader.peek_tag() == Some(0xa0) {
+        let _ = reader.read_tlv();
+    }
+    for _ in 0..5 {
+        if !reader.skip_one_tlv() {
+            return None;
+        }
+    }
+    let spki = reader.read_tlv()?;
+    if spki.tag != 0x30 {
+        return None;
+    }
+    let mut spki_reader = asn1::Reader::new(&spki.content);
+    spki_reader.skip_one_tlv();
+    let public_key = spki_reader.read_tlv()?;
+    if public_key.tag != 0x03 || public_key.content.is_empty() {
+        return None;
+    }
+    Some(public_key.content[1..].to_vec())
+}
+
+fn certificate_validity(der: &[u8]) -> Option<(f64, f64)> {
+    let tbs = certificate_tbs(der)?;
+    let mut reader = asn1::Reader::new(&tbs.content);
+    if reader.peek_tag() == Some(0xa0) {
+        let _ = reader.read_tlv();
+    }
+    reader.skip_one_tlv();
+    reader.skip_one_tlv();
+    reader.skip_one_tlv();
+    let validity = reader.read_tlv()?;
+    if validity.tag != 0x30 {
+        return None;
+    }
+    let mut validity_reader = asn1::Reader::new(&validity.content);
+    let not_before = validity_reader
+        .read_tlv()
+        .as_ref()
+        .and_then(time_tlv_to_unix_seconds)?;
+    let not_after = validity_reader
+        .read_tlv()
+        .as_ref()
+        .and_then(time_tlv_to_unix_seconds)?;
+    Some((not_before, not_after))
+}
+
+fn certificate_key_usage_allows_digital_signature(der: &[u8]) -> Option<bool> {
+    let extensions = certificate_extensions(der)?;
+    for ext in extensions {
+        let mut ext_reader = asn1::Reader::new(&ext);
+        let oid_tlv = ext_reader.read_tlv()?;
+        if oid_tlv.tag != 0x06 || asn1::oid_string(&oid_tlv.content) != "2.5.29.15" {
+            continue;
+        }
+        if ext_reader.peek_tag() == Some(0x01) {
+            let _ = ext_reader.read_tlv();
+        }
+        let value = ext_reader.read_tlv()?;
+        if value.tag != 0x04 {
+            return Some(false);
+        }
+        return Some(key_usage_contains_bit(&value.content, 0));
+    }
+    Some(true)
+}
+
+fn key_usage_contains_bit(der: &[u8], index: usize) -> bool {
+    let mut reader = asn1::Reader::new(der);
+    let Some(bit_string) = reader.read_tlv() else {
+        return false;
+    };
+    if bit_string.tag != 0x03 || bit_string.content.len() < 2 {
+        return false;
+    }
+    let unused_bits = usize::from(bit_string.content[0]);
+    let bytes = &bit_string.content[1..];
+    let bit_count = bytes.len().saturating_mul(8).saturating_sub(unused_bits);
+    if index >= bit_count {
+        return false;
+    }
+    let byte = bytes[index / 8];
+    let mask = 0x80 >> (index % 8);
+    byte & mask != 0
 }
 
 fn certificate_extensions(der: &[u8]) -> Option<Vec<Vec<u8>>> {

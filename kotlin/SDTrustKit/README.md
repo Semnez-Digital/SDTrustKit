@@ -68,6 +68,13 @@ val revocation = RevocationOptions(
             der = crlDer,
         ),
     ),
+    ocspCacheEntries = listOf(
+        OcspCacheEntry.fromUrl(
+            url = "https://example.com/ocsp",
+            validUntilUnixSeconds = 1_779_530_582.0,
+            der = ocspResponseDer,
+        ),
+    ),
 )
 
 val report = validator.verifyPdfIncludingRevocation(
@@ -85,7 +92,9 @@ The native library name is `sd_trust_kit`; Kotlin loads it with
 SDTrustKit does not perform live network fetching in the Rust core. Android apps
 should own trust-list refresh, CRL/OCSP fetch, and pinning policy, then pass
 deterministic trust/revocation material through `VerificationOptions` and
-`RevocationOptions`.
+`RevocationOptions`. PAdES OCSP evidence embedded in CMS/adbe archival values,
+CMS revocation values, `/DSS`, or `/VRI` dictionaries is evaluated by the core
+without an external OCSP cache entry.
 
 `ValidationReport.verdict` should drive badge color. `preservation.label` should
 drive preservation text such as Basic, Timestamped, Long-term, or Archive.

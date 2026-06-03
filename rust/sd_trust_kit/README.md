@@ -23,11 +23,16 @@ The core is intentionally offline and deterministic:
 - Validate RFC 3161 timestamp message imprints and TSA signatures
 - Evaluate pinned offline anchors where enough chain data is available
 - Load caller-owned trust fixtures for deterministic parity and debug runs
+- Evaluate signer revocation from caller-owned CRL/OCSP cache entries and
+  embedded PAdES OCSP evidence in CMS/adbe archival attributes, CMS revocation
+  values, `/DSS`, and `/VRI` dictionaries
 
 Network-backed revocation refresh and EU trusted-list refresh remain
 wrapper/application responsibilities. The core accepts caller-owned trust
 anchors, timestamp pins, EU trusted-list cache snapshots, and deterministic CRL
-cache entries.
+and OCSP cache entries. Embedded OCSP tokens are validated as document evidence,
+not as live cache responses, and are matched cryptographically to the signer
+certificate before they can satisfy revocation.
 
 ## Test
 
@@ -59,7 +64,8 @@ sd_trust_kit_free_string(json);
 ```
 
 Use `sd_trust_kit_verify_pdf_including_revocation_with_options_json` when a
-wrapper has deterministic CRL cache entries to pass into the core.
+wrapper has deterministic CRL/OCSP cache entries to pass into the core. The same
+path also evaluates OCSP evidence already embedded in PAdES PDFs.
 
 ## Android JNI
 

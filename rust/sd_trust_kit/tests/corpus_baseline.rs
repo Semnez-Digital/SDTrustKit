@@ -1,6 +1,6 @@
 use sd_trust_kit::{
-    report_sha256_hex, CrlCache, EuTrustedListCache, RevocationOptions, ValidationReport,
-    VerificationOptions,
+    report_sha256_hex, CrlCache, EuTrustedListCache, OcspCache, RevocationOptions,
+    ValidationReport, VerificationOptions,
 };
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -148,6 +148,7 @@ fn pdf_corpus_matches_swift_full_network_baseline() {
     let verification_options = full_baseline_verification_options(&eu_cache);
     let revocation_options = RevocationOptions {
         crl_cache: CrlCache::from_directory(fixture_path("crl_cache")).expect("CRL cache fixtures"),
+        ocsp_cache: OcspCache::default(),
         now_unix_seconds: validation_time,
     };
     let mut actual: Vec<CaseSnapshot> = pdfs

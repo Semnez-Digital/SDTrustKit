@@ -107,6 +107,39 @@ fn ffi_revocation_options_accept_external_crl_cache_entries() {
 }
 
 #[test]
+fn ffi_revocation_options_accept_external_ocsp_cache_entries() {
+    let revocation_options = CString::new(
+        r#"{
+            "nowUnixSeconds": 1779530582.0,
+            "ocspCacheEntries": [
+                {
+                    "url": "http://example.com/ocsp",
+                    "validUntilUnixSeconds": 1779530582.0,
+                    "derBase64": "AQID"
+                }
+            ]
+        }"#,
+    )
+    .expect("revocation options JSON CString");
+    let pdf = b"not a pdf";
+
+    let json = unsafe {
+        ffi_string(
+            sd_trust_kit::sd_trust_kit_verify_pdf_including_revocation_with_options_json(
+                pdf.as_ptr(),
+                pdf.len(),
+                std::ptr::null(),
+                revocation_options.as_ptr(),
+            ),
+        )
+    };
+    let value: Value = serde_json::from_str(&json).expect("FFI JSON");
+
+    assert_eq!(value["verdict"], "error");
+    assert!(value.get("error").is_none());
+}
+
+#[test]
 fn ffi_revocation_options_report_decode_errors_as_json() {
     let revocation_options = CString::new(
         r#"{

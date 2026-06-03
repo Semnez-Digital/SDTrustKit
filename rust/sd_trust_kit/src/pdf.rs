@@ -442,6 +442,31 @@ pub fn page_count_changed_after_signed_revision(pdf: &[u8], sig: &SigDict) -> bo
     signed_count != final_count
 }
 
+pub fn embedded_ocsp_responses(pdf: &[u8]) -> Vec<Vec<u8>> {
+    let objects = incremental_objects_with_object_streams(pdf);
+    let mut refs = Vec::new();
+    for object in objects.iter().filter(|object| {
+        contains_pdf_name(&object.scan, "DSS")
+            || contains_pdf_name(&object.scan, "VRI")
+            || contains_pdf_name(&object.scan, "OCSPs")
+            || contains_pdf_name(&object.scan, "OCSP")
+    }) {
+        for name in ["OCSPs", "OCSP"] {
+            for reference in array_references_after_name(&object.scan, name) {
+                push_unique(&mut refs, reference);
+            }
+        }
+    }
+
+    let mut out = Vec::new();
+    for reference in refs {
+        if let Some(bytes) = pdf_object_binary_value(pdf, reference) {
+            push_unique(&mut out, bytes);
+        }
+    }
+    out
+}
+
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct PDFObjectId {
     number: usize,
@@ -1242,6 +1267,48 @@ fn latest_object_value_bounds(
         }
     }
     found
+}
+
+fn pdf_object_binary_value(bytes: &[u8], id: PDFObjectId) -> Option<Vec<u8>> {
+    let (value_start, value_end) = latest_object_value_bounds(bytes, id, bytes.len())?;
+    let body = &bytes[value_start..value_end];
+    if let Some(stream) = pdf_stream_bytes(body) {
+        return Some(stream);
+    }
+    let i = skip_whitespace_and_comments(body, 0, body.len());
+    match body.get(i).copied()? {
+        b'(' => parse_literal_string(body, i).map(|(value, _)| value),
+        b'<' if body.get(i + 1) != Some(&b'<') => parse_hex_string(body, i).map(|(value, _)| value),
+        _ => None,
+    }
+}
+
+fn pdf_stream_bytes(object_body: &[u8]) -> Option<Vec<u8>> {
+    let stream = first_range(b"stream", object_body, 0, None)?;
+    let endstream = first_range(b"endstream", object_body, stream.end, None)?;
+    let header = &object_body[..stream.start];
+    let mut data_start = stream.end;
+    if object_body.get(data_start) == Some(&b'\r') {
+        data_start += 1;
+    }
+    if object_body.get(data_start) == Some(&b'\n') {
+        data_start += 1;
+    }
+    let data = &object_body[data_start..endstream.start];
+    if stream_uses_filter(header, b"FlateDecode") || stream_uses_filter(header, b"Fl") {
+        let mut decoder = ZlibDecoder::new(data);
+        let mut decoded = Vec::new();
+        decoder.read_to_end(&mut decoded).ok()?;
+        return Some(decoded);
+    }
+    Some(data.to_vec())
+}
+
+fn stream_uses_filter(header: &[u8], filter: &[u8]) -> bool {
+    let mut needle = Vec::with_capacity(filter.len() + 1);
+    needle.push(b'/');
+    needle.extend_from_slice(filter);
+    header.windows(needle.len()).any(|window| window == needle)
 }
 
 fn decode_pdf_text_string(bytes: &[u8]) -> Option<String> {

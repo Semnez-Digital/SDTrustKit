@@ -53,6 +53,7 @@ data class TimedTrustAnchorSet(
 data class RevocationOptions(
     val nowUnixSeconds: Double? = null,
     val crlCacheEntries: List<CrlCacheEntry> = emptyList(),
+    val ocspCacheEntries: List<OcspCacheEntry> = emptyList(),
 )
 
 @Serializable
@@ -80,6 +81,38 @@ data class CrlCacheEntry(
             der: ByteArray,
         ): CrlCacheEntry =
             CrlCacheEntry(
+                cacheKeySha256 = cacheKeySha256,
+                validUntilUnixSeconds = validUntilUnixSeconds,
+                derBase64 = base64(der),
+            )
+    }
+}
+
+@Serializable
+data class OcspCacheEntry(
+    val url: String? = null,
+    val cacheKeySha256: String? = null,
+    val validUntilUnixSeconds: Double,
+    val derBase64: String,
+) {
+    companion object {
+        fun fromUrl(
+            url: String,
+            validUntilUnixSeconds: Double,
+            der: ByteArray,
+        ): OcspCacheEntry =
+            OcspCacheEntry(
+                url = url,
+                validUntilUnixSeconds = validUntilUnixSeconds,
+                derBase64 = base64(der),
+            )
+
+        fun fromCacheKey(
+            cacheKeySha256: String,
+            validUntilUnixSeconds: Double,
+            der: ByteArray,
+        ): OcspCacheEntry =
+            OcspCacheEntry(
                 cacheKeySha256 = cacheKeySha256,
                 validUntilUnixSeconds = validUntilUnixSeconds,
                 derBase64 = base64(der),

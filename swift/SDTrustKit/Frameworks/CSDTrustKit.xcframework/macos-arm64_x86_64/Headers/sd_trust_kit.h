@@ -43,7 +43,7 @@ char *sd_trust_kit_verify_pdf_with_options_json(const uint8_t *pdf,
                                       const char *options_json);
 
 // Runs the revocation-aware verifier using caller-supplied trust material and
-// deterministic CRL cache entries. verification_options_json and
+// deterministic CRL/OCSP cache entries. verification_options_json and
 // revocation_options_json may be NULL for defaults.
 //
 // Supported revocation_options_json shape:
@@ -56,10 +56,18 @@ char *sd_trust_kit_verify_pdf_with_options_json(const uint8_t *pdf,
 //       "validUntilUnixSeconds": 1779530582.0,
 //       "derBase64": "..."
 //     }
+//   ],
+//   "ocspCacheEntries": [
+//     {
+//       "url": "https://example.com/ocsp",
+//       "cacheKeySha256": "optional-precomputed-cache-key",
+//       "validUntilUnixSeconds": 1779530582.0,
+//       "derBase64": "..."
+//     }
 //   ]
 // }
 //
-// nowUnixSeconds is required when crlCacheEntries is non-empty.
+// nowUnixSeconds is required when crlCacheEntries or ocspCacheEntries is non-empty.
 char *sd_trust_kit_verify_pdf_including_revocation_with_options_json(
     const uint8_t *pdf,
     size_t pdf_len,

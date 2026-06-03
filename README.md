@@ -61,7 +61,9 @@ The Rust core currently covers:
   verification, TSA EKU checks, and TSA trust evaluation
 - PAdES baseline reporting for `baselineB`, `baselineT`, `baselineLT`, and
   `baselineLTA`
-- Deterministic CRL cache evaluation when the caller supplies cached CRL entries
+- Deterministic revocation evaluation from caller-supplied CRL/OCSP cache
+  entries and embedded PAdES OCSP evidence in CMS/adbe archival attributes,
+  CMS revocation values, `/DSS`, and `/VRI` dictionaries
 - Conservative detection for malformed or suspicious PDF signature structures,
   including out-of-bounds byte ranges, altered signed revisions, field-reference
   swaps, and orphan signature dictionaries
@@ -69,7 +71,9 @@ The Rust core currently covers:
 The core intentionally does not perform live network fetching. Applications
 should fetch and cache trust lists, intermediate certificates, CRLs, OCSP
 responses, and timestamp policy material outside SDTrustKit, then pass the
-resulting deterministic inputs into validation.
+resulting deterministic inputs into validation. Embedded PAdES OCSP evidence is
+read from the PDF itself and still has to pass CertID matching, responder
+authentication, validity, and consistency checks.
 
 ## Report Model
 
@@ -134,7 +138,7 @@ cargo run --bin sd-trust-validate -- --full-fixtures tests/fixtures /path/to/fil
 
 `--offline-fixtures` loads local system trust-anchor fixtures. `--full-fixtures`
 loads app anchors, timestamp pins, EU trusted-list cache fixtures, system
-anchors, and CRL cache fixtures.
+anchors, CRL cache fixtures, and OCSP cache fixtures when present.
 
 ## C ABI
 
@@ -185,7 +189,7 @@ let options = VerificationOptions(
 let report = try validator.verifyPDF(pdfData, options: options)
 ```
 
-With deterministic CRL evidence:
+With deterministic CRL/OCSP evidence:
 
 ```swift
 let revocation = RevocationOptions(
@@ -195,6 +199,13 @@ let revocation = RevocationOptions(
             url: "https://example.com/intermediate.crl",
             validUntilUnixSeconds: 1_779_530_582,
             der: crlDer
+        )
+    ],
+    ocspCacheEntries: [
+        OcspCacheEntry(
+            url: "https://example.com/ocsp",
+            validUntilUnixSeconds: 1_779_530_582,
+            der: ocspResponseDer
         )
     ]
 )
@@ -243,7 +254,7 @@ val options = VerificationOptions.fromDer(
 val report = validator.verifyPdf(pdfBytes, options)
 ```
 
-With deterministic CRL evidence:
+With deterministic CRL/OCSP evidence:
 
 ```kotlin
 val revocation = RevocationOptions(
@@ -253,6 +264,13 @@ val revocation = RevocationOptions(
             url = "https://example.com/intermediate.crl",
             validUntilUnixSeconds = 1_779_530_582.0,
             der = crlDer,
+        ),
+    ),
+    ocspCacheEntries = listOf(
+        OcspCacheEntry.fromUrl(
+            url = "https://example.com/ocsp",
+            validUntilUnixSeconds = 1_779_530_582.0,
+            der = ocspResponseDer,
         ),
     ),
 )

@@ -1,6 +1,7 @@
 use crate::{
-    revocation::crl_cache_key_for_url, verify_pdf, verify_pdf_including_revocation_with_options,
-    verify_pdf_with_options, CrlCache, CrlCacheEntry, RevocationOptions, TimedTrustAnchorSet,
+    revocation::{crl_cache_key_for_url, ocsp_cache_key_for_url},
+    verify_pdf, verify_pdf_including_revocation_with_options, verify_pdf_with_options, CrlCache,
+    CrlCacheEntry, OcspCache, OcspCacheEntry, RevocationOptions, TimedTrustAnchorSet,
     ValidationReport, VerificationOptions,
 };
 use base64::Engine;
@@ -36,11 +37,21 @@ struct FfiTimedTrustAnchorSet {
 struct FfiRevocationOptions {
     now_unix_seconds: Option<f64>,
     crl_cache_entries: Vec<FfiCrlCacheEntry>,
+    ocsp_cache_entries: Vec<FfiOcspCacheEntry>,
 }
 
 #[derive(Debug, Default, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct FfiCrlCacheEntry {
+    url: Option<String>,
+    cache_key_sha256: Option<String>,
+    valid_until_unix_seconds: Option<f64>,
+    der_base64: Option<String>,
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+struct FfiOcspCacheEntry {
     url: Option<String>,
     cache_key_sha256: Option<String>,
     valid_until_unix_seconds: Option<f64>,
@@ -250,13 +261,14 @@ impl TryFrom<FfiRevocationOptions> for RevocationOptions {
     type Error = FfiFailure;
 
     fn try_from(value: FfiRevocationOptions) -> Result<Self, Self::Error> {
-        let has_crl_entries = !value.crl_cache_entries.is_empty();
+        let has_revocation_entries =
+            !value.crl_cache_entries.is_empty() || !value.ocsp_cache_entries.is_empty();
         let now_unix_seconds = match value.now_unix_seconds {
             Some(now) => now,
-            None if has_crl_entries => {
+            None if has_revocation_entries => {
                 return Err(FfiFailure::new(
                     "missingRevocationNow",
-                    "Revocation options with CRL cache entries require nowUnixSeconds.",
+                    "Revocation options with cache entries require nowUnixSeconds.",
                 ))
             }
             None => 0.0,
@@ -265,6 +277,9 @@ impl TryFrom<FfiRevocationOptions> for RevocationOptions {
         Ok(Self {
             crl_cache: CrlCache {
                 entries: crl_cache_entries(value.crl_cache_entries)?,
+            },
+            ocsp_cache: OcspCache {
+                entries: ocsp_cache_entries(value.ocsp_cache_entries)?,
             },
             now_unix_seconds,
         })
@@ -279,6 +294,53 @@ fn crl_cache_entries(entries: Vec<FfiCrlCacheEntry>) -> Result<Vec<CrlCacheEntry
         .collect::<Result<_, _>>()?;
     out.sort_by(|a, b| a.cache_key_sha256.cmp(&b.cache_key_sha256));
     Ok(out)
+}
+
+fn ocsp_cache_entries(entries: Vec<FfiOcspCacheEntry>) -> Result<Vec<OcspCacheEntry>, FfiFailure> {
+    let mut out: Vec<OcspCacheEntry> = entries
+        .into_iter()
+        .enumerate()
+        .map(|(index, entry)| ocsp_cache_entry(index, entry))
+        .collect::<Result<_, _>>()?;
+    out.sort_by(|a, b| a.cache_key_sha256.cmp(&b.cache_key_sha256));
+    Ok(out)
+}
+
+fn ocsp_cache_entry(index: usize, entry: FfiOcspCacheEntry) -> Result<OcspCacheEntry, FfiFailure> {
+    let cache_key_sha256 = match (entry.cache_key_sha256, entry.url) {
+        (Some(cache_key), _) => cache_key.to_ascii_lowercase(),
+        (None, Some(url)) => ocsp_cache_key_for_url(&url).ok_or_else(|| {
+            FfiFailure::new(
+                "invalidOcspUrl",
+                format!("ocspCacheEntries[{index}].url is not an HTTP(S) URL."),
+            )
+        })?,
+        (None, None) => {
+            return Err(FfiFailure::new(
+                "missingOcspCacheKey",
+                format!("ocspCacheEntries[{index}] needs url or cacheKeySha256."),
+            ))
+        }
+    };
+    let valid_until_unix_seconds = entry.valid_until_unix_seconds.ok_or_else(|| {
+        FfiFailure::new(
+            "missingOcspValidUntil",
+            format!("ocspCacheEntries[{index}].validUntilUnixSeconds is required."),
+        )
+    })?;
+    let der_base64 = entry.der_base64.ok_or_else(|| {
+        FfiFailure::new(
+            "missingOcspDer",
+            format!("ocspCacheEntries[{index}].derBase64 is required."),
+        )
+    })?;
+
+    Ok(OcspCacheEntry {
+        cache_key_sha256,
+        valid_until: valid_until_unix_seconds - APPLE_REFERENCE_UNIX_OFFSET,
+        der: decode_base64(der_base64, &format!("ocspCacheEntries[{index}].derBase64"))?,
+        require_current_freshness: true,
+    })
 }
 
 fn crl_cache_entry(index: usize, entry: FfiCrlCacheEntry) -> Result<CrlCacheEntry, FfiFailure> {

@@ -1,5 +1,7 @@
 use base64::Engine;
-use sd_trust_kit::{CrlCache, CrlCacheEntry, RevocationOptions, Verdict, VerificationOptions};
+use sd_trust_kit::{
+    CrlCache, CrlCacheEntry, OcspCache, RevocationOptions, Verdict, VerificationOptions,
+};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::collections::HashSet;
@@ -40,6 +42,7 @@ fn pdf_generator_manifest_matches_expected_outcomes() {
         let crl_cache = crl_cache_for_manifest(&run, &manifest);
         let revocation_options = RevocationOptions {
             crl_cache,
+            ocsp_cache: OcspCache::default(),
             now_unix_seconds: now_unix_seconds(),
         };
 
