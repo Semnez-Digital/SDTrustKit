@@ -5,16 +5,22 @@ use sd_trust_kit::{
 use std::path::{Path, PathBuf};
 
 #[test]
-fn dss_dictionary_embedded_ocsp_satisfies_signer_revocation_without_external_cache() {
-    assert_embedded_ocsp_revocation_ok("dss-pades/validation/pades-ocsp-sign-cert.pdf");
+fn stale_dss_dictionary_embedded_ocsp_without_trusted_timestamp_does_not_satisfy_revocation() {
+    assert_embedded_ocsp_revocation_not_ok(
+        "dss-pades/validation/pades-ocsp-sign-cert.pdf",
+        1_779_530_582.0,
+    );
 }
 
 #[test]
-fn adbe_archival_embedded_ocsp_satisfies_signer_revocation_without_external_cache() {
-    assert_embedded_ocsp_revocation_ok("dss-pades/validation/adbe_ocsp_signed.pdf");
+fn stale_adbe_archival_embedded_ocsp_without_trusted_timestamp_does_not_satisfy_revocation() {
+    assert_embedded_ocsp_revocation_not_ok(
+        "dss-pades/validation/adbe_ocsp_signed.pdf",
+        1_779_530_582.0,
+    );
 }
 
-fn assert_embedded_ocsp_revocation_ok(relative: &str) {
+fn assert_embedded_ocsp_revocation_not_ok(relative: &str, now_unix_seconds: f64) {
     let Some(root) = eu_dss_fixture_root() else {
         eprintln!("skipping EU-DSS fixture-backed OCSP test; run fixture ingestion to enable");
         return;
@@ -25,27 +31,32 @@ fn assert_embedded_ocsp_revocation_ok(relative: &str) {
         &pdf,
         &VerificationOptions::default(),
         &RevocationOptions {
-            now_unix_seconds: 1_779_530_582.0,
+            now_unix_seconds,
             ..RevocationOptions::default()
         },
     );
+    let revocation_steps = revocation_steps(&report);
+
+    assert!(
+        !revocation_steps
+            .iter()
+            .any(|step| step.status == Status::Ok),
+        "{relative} unexpectedly satisfied signer revocation from stale embedded OCSP: {:?}",
+        revocation_steps
+            .iter()
+            .map(|step| (&step.status, step.detail.as_str()))
+            .collect::<Vec<_>>()
+    );
+}
+
+fn revocation_steps(report: &sd_trust_kit::ValidationReport) -> Vec<&sd_trust_kit::Step> {
     let revocation_steps: Vec<_> = report
         .signatures
         .iter()
         .flat_map(|signature| signature.steps.iter())
         .filter(|step| step.kind == StepKind::RevocationSigner)
         .collect();
-
-    assert!(
-        revocation_steps
-            .iter()
-            .any(|step| step.status == Status::Ok),
-        "{relative} did not satisfy signer revocation from embedded OCSP: {:?}",
-        revocation_steps
-            .iter()
-            .map(|step| (&step.status, step.detail.as_str()))
-            .collect::<Vec<_>>()
-    );
+    revocation_steps
 }
 
 fn eu_dss_fixture_root() -> Option<PathBuf> {

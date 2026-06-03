@@ -1172,6 +1172,7 @@ fn append_revocation_step(
     );
     issuer_certificates = trust::unique_certificates(issuer_certificates);
 
+    let trusted_timestamp_time = trusted_signature_timestamp_time_unix_seconds(report);
     let mut ocsp_cache = options.ocsp_cache.clone();
     for der in cms
         .embedded_ocsp_responses()
@@ -1182,11 +1183,10 @@ fn append_revocation_step(
             cache_key_sha256: String::new(),
             valid_until: f64::INFINITY,
             der,
-            require_current_freshness: false,
+            require_current_freshness: trusted_timestamp_time.is_none(),
         });
     }
 
-    let trusted_timestamp_time = trusted_signature_timestamp_time_unix_seconds(report);
     let validation_time = trusted_timestamp_time.unwrap_or(options.now_unix_seconds);
     let status = revocation::check_certificate_status(
         &signer_cert_der,
@@ -1305,6 +1305,7 @@ pub fn report_sha256_hex(bytes: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::{Path, PathBuf};
 
     #[test]
     fn revocation_time_ignores_untrusted_claimed_signing_time() {
@@ -1332,6 +1333,67 @@ mod tests {
         assert_eq!(
             signature_revocation_time_unix_seconds(&report, 1_779_530_582.0),
             1_779_667_200.0
+        );
+    }
+
+    #[test]
+    fn embedded_ocsp_can_satisfy_revocation_when_trusted_timestamp_proves_time() {
+        let Some(root) = eu_dss_fixture_root() else {
+            eprintln!(
+                "skipping EU-DSS fixture-backed OCSP unit test; run fixture ingestion to enable"
+            );
+            return;
+        };
+        let pdf = std::fs::read(root.join("dss-pades/validation/adbe_ocsp_signed.pdf"))
+            .expect("read EU-DSS adbe OCSP fixture");
+        let (sigs, _) = usable_signature_dictionaries(&pdf);
+        let sig = sigs
+            .iter()
+            .find(|sig| !sig.is_document_timestamp())
+            .expect("document signature");
+        let mut report = verify_pdf_with_options(&pdf, &VerificationOptions::default());
+        let signature_report = report
+            .signatures
+            .first_mut()
+            .expect("signature report from fixture");
+        signature_report.steps.extend([
+            Step::new(StepKind::TsaMessageImprint, Status::Ok, "ok"),
+            Step::new(StepKind::TsaSignatureVerify, Status::Ok, "ok"),
+            Step::new(StepKind::TsaExtendedKeyUsage, Status::Ok, "ok"),
+            Step::new(StepKind::TsaCertificateChain, Status::Ok, "ok"),
+        ]);
+        signature_report.timestamp_details = Some(TimestampDetails {
+            timestamp_time: Some("000101000000Z".to_owned()),
+            policy_oid: None,
+            serial_number_hex: None,
+            message_imprint_algorithm: None,
+            message_imprint_hash: None,
+            tsa_certificate: None,
+            tsa_certificate_chain: vec![],
+            trust_detail: None,
+        });
+
+        append_revocation_step(
+            signature_report,
+            &pdf,
+            sig,
+            &RevocationOptions {
+                now_unix_seconds: 1_779_530_582.0,
+                ..RevocationOptions::default()
+            },
+        );
+
+        assert!(
+            signature_report.steps.iter().any(|step| {
+                step.kind == StepKind::RevocationSigner && step.status == Status::Ok
+            }),
+            "trusted proof time should allow embedded OCSP evidence: {:?}",
+            signature_report
+                .steps
+                .iter()
+                .filter(|step| step.kind == StepKind::RevocationSigner)
+                .map(|step| (&step.status, step.detail.as_str()))
+                .collect::<Vec<_>>()
         );
     }
 
@@ -1394,5 +1456,19 @@ endobj
             pades_level: PadesLevel::BaselineB,
             preservation: PreservationAssessment::unknown("test report"),
         }
+    }
+
+    fn eu_dss_fixture_root() -> Option<PathBuf> {
+        if let Ok(path) = std::env::var("EU_DSS_FIXTURE_ROOT") {
+            return Some(PathBuf::from(path));
+        }
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("workspace root")
+            .join(
+                "validation-corpus/eu-dss-fixtures/d9473b8efea72fd5754623fa92bb9311f2b005c5/resources",
+            );
+        root.is_dir().then_some(root)
     }
 }

@@ -310,28 +310,30 @@ fn parse_other_revocation_infos(content: &[u8]) -> Vec<(String, Vec<u8>)> {
     let mut out = Vec::new();
     let mut reader = Reader::new(content);
     while let Some(choice) = reader.read_tlv() {
-        if choice.tag == 0x30 {
-            let mut choice_reader = Reader::new(&choice.content);
-            let Some(oid_tlv) = choice_reader.read_tlv() else {
-                continue;
-            };
-            if oid_tlv.tag != 0x06 {
-                continue;
-            }
-            let Some(value_tlv) = choice_reader.read_tlv() else {
-                continue;
-            };
-            let value = if value_tlv.tag == 0xa0 {
-                let mut explicit_reader = Reader::new(&value_tlv.content);
-                explicit_reader
-                    .read_tlv()
-                    .map(|tlv| tlv.full_bytes)
-                    .unwrap_or(value_tlv.content)
-            } else {
-                value_tlv.full_bytes
-            };
-            out.push((asn1::oid_string(&oid_tlv.content), value));
+        let content = match choice.tag {
+            0x30 | 0xa1 => choice.content,
+            _ => continue,
+        };
+        let mut choice_reader = Reader::new(&content);
+        let Some(oid_tlv) = choice_reader.read_tlv() else {
+            continue;
+        };
+        if oid_tlv.tag != 0x06 {
+            continue;
         }
+        let Some(value_tlv) = choice_reader.read_tlv() else {
+            continue;
+        };
+        let value = if value_tlv.tag == 0xa0 {
+            let mut explicit_reader = Reader::new(&value_tlv.content);
+            explicit_reader
+                .read_tlv()
+                .map(|tlv| tlv.full_bytes)
+                .unwrap_or(value_tlv.content)
+        } else {
+            value_tlv.full_bytes
+        };
+        out.push((asn1::oid_string(&oid_tlv.content), value));
     }
     out
 }
@@ -577,6 +579,22 @@ mod tests {
         assert_eq!(
             cms.cert_for_signer(&signer_with_issuer_and_serial(issuer, serial)),
             None
+        );
+    }
+
+    #[test]
+    fn parses_context_specific_other_revocation_info_choice() {
+        let ocsp_response = vec![0x30, 0x03, 0x0a, 0x01, 0x00];
+        let mut other_revocation_info =
+            vec![0x06, 0x08, 0x2b, 0x06, 0x01, 0x05, 0x05, 0x07, 0x10, 0x02];
+        other_revocation_info.extend(ocsp_response.clone());
+        let mut crls_content = vec![0xa1];
+        crls_content.extend(asn1::der_length(other_revocation_info.len()));
+        crls_content.extend(other_revocation_info);
+
+        assert_eq!(
+            parse_other_revocation_infos(&crls_content),
+            vec![(OID_CMS_OCSP_RESPONSE.to_owned(), ocsp_response)]
         );
     }
 
