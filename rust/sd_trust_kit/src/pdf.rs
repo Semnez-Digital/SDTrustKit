@@ -994,10 +994,11 @@ fn parse_modification_date(bytes: &[u8], object_start: usize, object_end: usize)
     while i < object_end && is_whitespace(bytes[i]) {
         i += 1;
     }
-    if i >= object_end || bytes[i] != b'(' {
-        return None;
-    }
-    let (literal, end) = parse_literal_string(bytes, i)?;
+    let (literal, end) = match bytes.get(i) {
+        Some(b'(') => parse_literal_string(bytes, i)?,
+        Some(b'<') => parse_hex_string(bytes, i)?,
+        _ => return None,
+    };
     if end > object_end {
         return None;
     }
@@ -2006,6 +2007,16 @@ endobj
     #[test]
     fn modification_date_decodes_pdf_literal_string_escapes() {
         let pdf = br#"<< /Type /Sig /M (D\07220260603115804Z) >>"#;
+
+        assert_eq!(
+            parse_modification_date(pdf, 0, pdf.len()),
+            Some("D:20260603115804Z".to_owned())
+        );
+    }
+
+    #[test]
+    fn modification_date_decodes_pdf_hex_string() {
+        let pdf = br#"<< /Type /Sig /M <443A32303236303630333131353830345A> >>"#;
 
         assert_eq!(
             parse_modification_date(pdf, 0, pdf.len()),
