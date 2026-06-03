@@ -997,22 +997,9 @@ fn parse_modification_date(bytes: &[u8], object_start: usize, object_end: usize)
     if i >= object_end || bytes[i] != b'(' {
         return None;
     }
-    i += 1;
-    let mut literal = Vec::new();
-    let mut escaped = false;
-    while i < object_end {
-        let b = bytes[i];
-        i += 1;
-        if escaped {
-            literal.push(b);
-            escaped = false;
-        } else if b == b'\\' {
-            escaped = true;
-        } else if b == b')' {
-            break;
-        } else {
-            literal.push(b);
-        }
+    let (literal, end) = parse_literal_string(bytes, i)?;
+    if end > object_end {
+        return None;
     }
     String::from_utf8(literal).ok()
 }
@@ -2014,6 +2001,16 @@ endobj
 %%EOF"#;
 
         assert!(SigDict::parse_all(pdf).is_empty());
+    }
+
+    #[test]
+    fn modification_date_decodes_pdf_literal_string_escapes() {
+        let pdf = br#"<< /Type /Sig /M (D\07220260603115804Z) >>"#;
+
+        assert_eq!(
+            parse_modification_date(pdf, 0, pdf.len()),
+            Some("D:20260603115804Z".to_owned())
+        );
     }
 
     fn test_sig_dict(object_number: usize, signed_revision_size: usize) -> SigDict {
