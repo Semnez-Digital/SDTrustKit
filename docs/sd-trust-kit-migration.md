@@ -1,8 +1,8 @@
 # SDTrustKit Migration Notes
 
-Current release: `1.0.3`.
+Current release: `1.0.4`.
 
-`1.0.3` includes signer-chain validity hardening, PDF timestamp parser guardrails, and OCSP revocation support.
+`1.0.4` binds every timestamp signature to its TSTInfo through messageDigest and only honours a timestamp certificate pin on a verified issuing chain. `1.0.3` includes signer-chain validity hardening, PDF timestamp parser guardrails, and OCSP revocation support.
 `ValidationReport` and document
 `SignatureReport` include `padesLevel` and `preservation` fields in the Rust
 JSON and Swift DTOs.

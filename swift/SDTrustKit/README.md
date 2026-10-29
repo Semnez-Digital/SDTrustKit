@@ -4,9 +4,9 @@ Swift Package Manager wrapper for the SDTrustKit Rust PDF validation core. The
 Swift layer owns option encoding, FFI memory handling, and report decoding while
 validation runs inside the bundled `CSDTrustKit.xcframework`.
 
-Current version: `1.0.3`.
+Current version: `1.0.4`.
 
-`1.0.3` includes signer-chain validity hardening, PDF timestamp parser guardrails, and OCSP revocation support.
+`1.0.4` binds every timestamp signature to its TSTInfo through messageDigest and only honours a timestamp certificate pin on a verified issuing chain. `1.0.3` includes signer-chain validity hardening, PDF timestamp parser guardrails, and OCSP revocation support.
 `ValidationReport` and `SignatureReport` include `padesLevel` and
 `preservation` fields.
 

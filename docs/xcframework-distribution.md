@@ -2,12 +2,12 @@
 
 SDTrustKit ships a Swift package backed by a static Rust XCFramework:
 
-- Current version: `1.0.3`
+- Current version: `1.0.4`
 - Swift target: `SDTrustKit`
 - C binary target: `CSDTrustKit`
 - Artifact path: `swift/SDTrustKit/Frameworks/CSDTrustKit.xcframework`
 
-`1.0.3` includes signer-chain validity hardening, PDF timestamp parser guardrails, and OCSP revocation support.
+`1.0.4` binds every timestamp signature to its TSTInfo through messageDigest and only honours a timestamp certificate pin on a verified issuing chain. `1.0.3` includes signer-chain validity hardening, PDF timestamp parser guardrails, and OCSP revocation support.
 `ValidationReport` and document
 `SignatureReport` include `padesLevel` and `preservation` fields so apps can
 show PAdES preservation labels separately from the validation verdict.
@@ -85,7 +85,7 @@ engine changes underneath it.
 Use this prompt when wiring SDTrustKit into CEISign:
 
 ```text
-You are working in the CEISign app. Integrate SDTrustKit 1.0.3 with the smallest
+You are working in the CEISign app. Integrate SDTrustKit 1.0.4 with the smallest
 possible app-facing change.
 
 Context:

@@ -5,7 +5,7 @@ module mirrors the Swift package: it JSON-encodes caller-owned validation
 options, calls the Rust core through JNI, and decodes the Rust
 `ValidationReport` JSON into Kotlin DTOs.
 
-Current version: `1.0.3`.
+Current version: `1.0.4`.
 
 ## Installation
 
