@@ -95,19 +95,27 @@ pub fn trusted_chain_to_certificate_sha256_pin(
     if sha256_pins.is_empty() {
         return None;
     }
-    let mut certificates = vec![leaf.to_vec()];
-    certificates.extend(intermediates.iter().cloned());
-    if certificates.iter().any(|cert| {
+    let is_pinned = |cert: &[u8]| {
         let fingerprint = fingerprint_plain(Sha256::digest(cert));
         sha256_pins
             .iter()
             .any(|pin| fingerprint.eq_ignore_ascii_case(&pin.replace(':', "")))
-    }) {
-        let mut chain = vec![leaf.to_vec()];
-        chain.extend(intermediates.iter().cloned());
-        return Some(unique_certificates(chain));
+    };
+    if is_pinned(leaf) {
+        return Some(vec![leaf.to_vec()]);
     }
-    None
+    // A pinned CA only vouches for certificates it actually issued. Matching
+    // any certificate in the bag let a token carry a copy of a pinned CA next
+    // to an unrelated signer, so the pin must sit on a verified chain.
+    let pinned: Vec<Vec<u8>> = intermediates
+        .iter()
+        .filter(|cert| is_pinned(cert))
+        .cloned()
+        .collect();
+    if pinned.is_empty() {
+        return None;
+    }
+    manual_trusted_chain_to_anchor(leaf, intermediates, &pinned, &[], None, None)
 }
 
 fn manual_trusted_chain_to_anchor(
@@ -665,6 +673,52 @@ mod tests {
                 .expect("leaf anchor should be trusted");
 
         assert_eq!(chain, vec![CALLER_SUPPLIED_CERT.to_vec()]);
+    }
+
+    fn control_valid_signer_and_bag() -> (Vec<u8>, Vec<Vec<u8>>) {
+        let pdf = fs::read(fixture_path("pdf_model_gaps/control-valid.pdf")).expect("read PDF");
+        let sig = crate::pdf::SigDict::parse_all(&pdf)
+            .into_iter()
+            .find(|sig| !sig.is_document_timestamp())
+            .expect("document signature");
+        let cms = crate::cms::Cms::parse(&sig.cms_bytes).expect("CMS");
+        let signer = cms.signer_infos.first().expect("signerInfo");
+        let signer_cert = cms.cert_for_signer(signer).expect("signer cert");
+        let bag = cms
+            .certificates
+            .iter()
+            .filter(|cert| **cert != signer_cert)
+            .cloned()
+            .collect::<Vec<_>>();
+        (signer_cert, bag)
+    }
+
+    fn sha256_pin(cert: &[u8]) -> String {
+        super::fingerprint_plain(<sha2::Sha256 as sha2::Digest>::digest(cert))
+    }
+
+    #[test]
+    fn pinned_issuer_on_a_verified_chain_is_trusted() {
+        let (signer, bag) = control_valid_signer_and_bag();
+        assert!(!bag.is_empty(), "fixture should carry its issuing CA");
+        let pins = bag.iter().map(|cert| sha256_pin(cert)).collect::<Vec<_>>();
+
+        assert!(trusted_chain_to_certificate_sha256_pin(&signer, &bag, &pins).is_some());
+    }
+
+    /// A forged token can carry a copy of a pinned CA next to a signer that
+    /// CA never issued. The pin must not vouch for that signer.
+    #[test]
+    fn pinned_certificate_that_did_not_issue_the_signer_is_not_trusted() {
+        let (signer, mut bag) = control_valid_signer_and_bag();
+        bag.push(CALLER_SUPPLIED_CERT.to_vec());
+
+        assert!(trusted_chain_to_certificate_sha256_pin(
+            &signer,
+            &bag,
+            &[CALLER_SUPPLIED_CERT_SHA256.to_owned()],
+        )
+        .is_none());
     }
 
     #[test]
