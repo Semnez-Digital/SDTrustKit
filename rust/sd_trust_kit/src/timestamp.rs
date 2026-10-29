@@ -14,6 +14,28 @@ struct TstInfoDetails {
     gen_time: Option<String>,
 }
 
+/// The TSA's signature covers its signed attributes, and only the
+/// messageDigest attribute among them binds the signature to the TSTInfo
+/// (the time, the imprint, the serial). Without comparing it to the hash of
+/// the encapsulated TSTInfo, any genuine token's signerInfo could be reused
+/// with a TSTInfo of the attacker's choosing.
+fn tst_info_matches_message_digest(
+    tst_cms: &Cms,
+    tst_signer: &crate::cms::SignerInfo,
+    digest_alg: &str,
+) -> bool {
+    let Some(tst_info) = tst_cms.e_content.as_deref() else {
+        return false;
+    };
+    let Some(expected) = tst_signer
+        .find_signed_attribute(crate::cms::OID_MESSAGE_DIGEST)
+        .and_then(crate::asn1::first_octet_string)
+    else {
+        return false;
+    };
+    crypto::digest(tst_info, digest_alg).as_deref() == Some(expected.as_slice())
+}
+
 pub fn verify_signature_timestamp(
     steps: &mut Vec<Step>,
     signer_signature: &[u8],
@@ -91,7 +113,7 @@ pub fn verify_signature_timestamp(
             tsa_digest_alg,
             &tst_signer.signature,
             cert,
-        )
+        ) && tst_info_matches_message_digest(&tst_cms, tst_signer, tsa_digest_alg)
     } else {
         false
     };
@@ -313,7 +335,7 @@ where
             tsa_digest_alg,
             &tst_signer.signature,
             cert,
-        )
+        ) && tst_info_matches_message_digest(&tst_cms, tst_signer, tsa_digest_alg)
     } else {
         false
     };
@@ -534,5 +556,62 @@ fn make_timestamp_details(
             .filter_map(|cert| trust::certificate_details(cert))
             .collect(),
         trust_detail,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::verify_signature_timestamp;
+    use crate::cms::Cms;
+    use crate::report::{Status, StepKind};
+    use crate::VerificationOptions;
+    use std::path::Path;
+
+    /// A public DSS test token (disig.tst), untouched.
+    fn dss_token() -> Vec<u8> {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(
+            "../../validation-corpus/eu-dss-fixtures/d9473b8efea72fd5754623fa92bb9311f2b005c5/resources/dss-spi/disig.tst",
+        );
+        std::fs::read(path).expect("read disig.tst")
+    }
+
+    fn tsa_signature_status(token: &[u8]) -> Status {
+        let mut steps = Vec::new();
+        verify_signature_timestamp(&mut steps, &[0u8; 32], token, &VerificationOptions::default());
+        steps
+            .iter()
+            .find(|step| step.kind == StepKind::TsaSignatureVerify)
+            .map(|step| step.status)
+            .expect("TSA signature step")
+    }
+
+    /// Moves the year in the TSTInfo genTime by one, leaving the DER structure
+    /// and the TSA's signerInfo exactly as they were.
+    fn with_backdated_gen_time(token: &[u8]) -> Vec<u8> {
+        let tst_info = Cms::parse(token).and_then(|cms| cms.e_content).expect("TSTInfo");
+        let start = token
+            .windows(tst_info.len())
+            .position(|window| window == tst_info.as_slice())
+            .expect("TSTInfo bytes inside the token");
+        let gen_time = tst_info
+            .windows(2)
+            .position(|pair| pair[0] == 0x18 && pair[1] >= 15 && pair[1] <= 19)
+            .expect("GeneralizedTime in TSTInfo");
+        let year_digit = start + gen_time + 2 + 3;
+        let mut tampered = token.to_vec();
+        tampered[year_digit] = if tampered[year_digit] == b'0' { b'9' } else { tampered[year_digit] - 1 };
+        tampered
+    }
+
+    #[test]
+    fn genuine_token_signature_verifies() {
+        assert_eq!(tsa_signature_status(&dss_token()), Status::Ok);
+    }
+
+    /// The TSA signature covers the signed attributes, not the TSTInfo, so a
+    /// TSTInfo edited under a genuine signerInfo must fail on messageDigest.
+    #[test]
+    fn token_with_edited_tst_info_fails_signature_verification() {
+        assert_eq!(tsa_signature_status(&with_backdated_gen_time(&dss_token())), Status::Fail);
     }
 }
