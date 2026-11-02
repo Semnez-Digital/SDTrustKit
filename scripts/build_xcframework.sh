@@ -41,6 +41,13 @@ build_staticlib() {
   local target="$1"
   echo "==> Building Rust staticlib for $target"
   case "$target" in
+    *apple-ios-macabi)
+      # One codegen unit: with several, the x86_64 Mac Catalyst staticlib
+      # carried the same drop glue twice and the app failed to link with
+      # duplicate symbols.
+      env IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1 \
+        cargo rustc --manifest-path "$CRATE_DIR/Cargo.toml" --release --target "$target" --lib --crate-type staticlib
+      ;;
     *apple-ios*)
       env IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" \
         cargo rustc --manifest-path "$CRATE_DIR/Cargo.toml" --release --target "$target" --lib --crate-type staticlib
