@@ -17,6 +17,8 @@ TARGETS=(
   "x86_64-apple-ios"
   "aarch64-apple-darwin"
   "x86_64-apple-darwin"
+  "aarch64-apple-ios-macabi"
+  "x86_64-apple-ios-macabi"
 )
 
 ensure_target() {
@@ -74,6 +76,7 @@ MODULEMAP
 IPHONEOS_LIB="$BUILD_DIR/libsd_trust_kit-ios.a"
 SIMULATOR_LIB="$BUILD_DIR/libsd_trust_kit-ios-simulator.a"
 MACOS_LIB="$BUILD_DIR/libsd_trust_kit-macos.a"
+CATALYST_LIB="$BUILD_DIR/libsd_trust_kit-maccatalyst.a"
 
 cp "$CRATE_DIR/target/aarch64-apple-ios/release/libsd_trust_kit.a" "$IPHONEOS_LIB"
 lipo -create \
@@ -84,16 +87,23 @@ lipo -create \
   "$CRATE_DIR/target/aarch64-apple-darwin/release/libsd_trust_kit.a" \
   "$CRATE_DIR/target/x86_64-apple-darwin/release/libsd_trust_kit.a" \
   -output "$MACOS_LIB"
+# Mac Catalyst: an iPad app built for the Mac links the iOS-for-Mac ABI.
+lipo -create \
+  "$CRATE_DIR/target/aarch64-apple-ios-macabi/release/libsd_trust_kit.a" \
+  "$CRATE_DIR/target/x86_64-apple-ios-macabi/release/libsd_trust_kit.a" \
+  -output "$CATALYST_LIB"
 
 xcrun strip -S -x "$IPHONEOS_LIB"
 xcrun strip -S -x "$SIMULATOR_LIB"
 xcrun strip -S -x "$MACOS_LIB"
+xcrun strip -S -x "$CATALYST_LIB"
 
 rm -rf "$OUTPUT_DIR/$XCFRAMEWORK_NAME"
 xcodebuild -create-xcframework \
   -library "$IPHONEOS_LIB" -headers "$HEADER_DIR" \
   -library "$SIMULATOR_LIB" -headers "$HEADER_DIR" \
   -library "$MACOS_LIB" -headers "$HEADER_DIR" \
+  -library "$CATALYST_LIB" -headers "$HEADER_DIR" \
   -output "$OUTPUT_DIR/$XCFRAMEWORK_NAME"
 
 echo "==> Wrote $OUTPUT_DIR/$XCFRAMEWORK_NAME"
